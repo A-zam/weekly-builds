@@ -1,0 +1,16 @@
+{
+  "name": "navbat",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Online clinic queue: book from home, see live position and wait time.",
+  "main": "server.js",
+  "engines": { "node": ">=22.5" },
+  "scripts": {
+    "start": "node --disable-warning=ExperimentalWarning server.js",
+    "dev": "node --disable-warning=ExperimentalWarning --watch server.js",
+    "test": "node --disable-warning=ExperimentalWarning --test \"test/*.test.js\""
+  },
+  "dependencies": {
+    "express": "^5.1.0"
+  }
+}

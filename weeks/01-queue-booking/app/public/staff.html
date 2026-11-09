@@ -1,0 +1,187 @@
+<!doctype html>
+<html lang="uz">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Xodimlar paneli</title>
+  <link rel="stylesheet" href="/css/style.css">
+</head>
+<body>
+  <header class="top">
+    <div class="wrap wide">
+      <div class="logo">+</div>
+      <div>
+        <h1 data-clinic>Klinika</h1>
+        <p>Xodimlar paneli</p>
+      </div>
+      <div class="spacer"></div>
+      <button class="btn sm ghost hidden" id="logout" style="color:#fff;border-color:rgba(255,255,255,.4)">Chiqish</button>
+    </div>
+  </header>
+
+  <main class="wrap wide">
+    <!-- PIN gate -->
+    <form id="pin-form" class="card pin hidden">
+      <h2 style="margin-top:0">Kirish</h2>
+      <div class="field">
+        <label for="pin">PIN kod</label>
+        <input class="input" id="pin" type="password" inputmode="numeric" autocomplete="current-password">
+        <div class="err hidden" id="pin-err">PIN noto'g'ri</div>
+        <div class="hint hidden" id="pin-demo">Demo uchun PIN: <b>1234</b></div>
+      </div>
+      <button class="btn block" style="margin-top:16px">Kirish</button>
+    </form>
+
+    <!-- Board -->
+    <section id="board" class="hidden">
+      <div class="toolbar">
+        <label for="filter" style="margin:0">Ko'rinish:</label>
+        <select id="filter"><option value="">Barcha shifokorlar</option></select>
+        <span class="muted small" id="updated"></span>
+      </div>
+      <div id="grid" class="grid"></div>
+    </section>
+  </main>
+
+  <script src="/js/common.js"></script>
+  <script>
+    let pin = sessionStorage.getItem('navbat.pin');
+    let data = null;
+    const params = new URLSearchParams(location.search);
+
+    const minutesSince = (ms) => Math.max(0, Math.round((Date.now() - ms) / 60000));
+
+    function panel(d) {
+      const cur = d.current
+        ? `<div class="current">
+             <div style="display:flex;justify-content:space-between;align-items:baseline;gap:8px">
+               <span class="code">${esc(d.current.code)}</span>
+               <span class="small"><b>${minutesSince(d.current.calledAt)} daq</b> qabulda</span>
+             </div>
+             <div><b>${esc(d.current.name)}</b> · <a href="tel:${esc(d.current.phone)}">${esc(fmtPhone(d.current.phone))}</a></div>
+             <div class="small">${esc(d.current.issue)}</div>
+             <div class="row-actions">
+               <button class="btn sm ok" data-act="finish" data-id="${d.id}">✓ Qabul tugadi</button>
+               <button class="btn sm danger-ghost" data-act="no-show" data-id="${d.id}">Kelmadi</button>
+             </div>
+           </div>`
+        : `<div class="current empty">Hozir qabulda hech kim yo'q</div>`;
+
+      const next = d.waiting[0];
+      const list = d.waiting.length
+        ? `<ul class="qlist">${d.waiting.map((w) => `
+            <li>
+              <span class="c">${esc(w.code)}</span>
+              <span><b>${esc(w.name)}</b> · <a href="tel:${esc(w.phone)}">${esc(fmtPhone(w.phone))}</a>
+                <span class="muted small">· ${fmtClock(w.createdAt)}</span></span>
+              <span class="issue">${esc(w.issue)}</span>
+            </li>`).join('')}</ul>`
+        : `<p class="muted small">Navbatda hech kim yo'q</p>`;
+
+      return `
+        <article class="card panel stack">
+          <div class="doctor-head">
+            <div><h3>${esc(d.specialty)} · ${esc(d.room)}-xona</h3><div class="who">${esc(d.name)}</div></div>
+            <label class="switch"><input type="checkbox" data-act="pause" data-id="${d.id}" ${d.paused ? 'checked' : ''}> To'xtatish</label>
+          </div>
+          <div class="stats">
+            <div class="stat"><b>${d.waitingCount}</b><span>kutmoqda</span></div>
+            <div class="stat"><b>${d.avgMinutes} daq</b><span>o'rtacha qabul</span></div>
+            <div class="stat"><b>${fmtWait(d.waitForNewMinutes)}</b><span>yangi bemor kutadi</span></div>
+          </div>
+          ${d.paused ? `<div class="note warn small">Yangi onlayn navbatlar qabul qilinmayapti</div>` : ''}
+          ${cur}
+          <button class="btn block" data-act="next" data-id="${d.id}" ${next ? '' : 'disabled'}>
+            ${next ? `Keyingisini chaqirish: ${esc(next.code)}` : 'Keyingi bemor yo\'q'}
+          </button>
+          <div><b class="small">Navbatda</b>${list}</div>
+        </article>`;
+    }
+
+    function render() {
+      if (!data) return;
+      const sel = $('#filter');
+      if (sel.options.length === 1) {
+        for (const d of data.doctors) sel.add(new Option(`${d.specialty}: ${d.name}`, d.id));
+        sel.value = params.get('doctor') || '';
+      }
+      const shown = sel.value ? data.doctors.filter((d) => String(d.id) === sel.value) : data.doctors;
+      $('#grid').innerHTML = shown.map(panel).join('');
+      $('#updated').textContent = `Yangilandi: ${fmtClock(Date.now())}`;
+    }
+
+    async function refresh() {
+      if (!pin) return;
+      const res = await api('/api/staff/queue', { pin });
+      if (res.status === 401) return showPin(true);
+      if (!res.ok) return;
+      data = res.data;
+      render();
+    }
+
+    async function showPin(wrong = false) {
+      pin = null;
+      sessionStorage.removeItem('navbat.pin');
+      $('#board').classList.add('hidden');
+      $('#logout').classList.add('hidden');
+      $('#pin-form').classList.remove('hidden');
+      $('#pin-err').classList.toggle('hidden', !wrong);
+      const clinic = await loadClinicName();
+      if (clinic?.demo) $('#pin-demo').classList.remove('hidden');
+      $('#pin').focus();
+    }
+
+    let started = false;
+    function showBoard() {
+      $('#pin-form').classList.add('hidden');
+      $('#board').classList.remove('hidden');
+      $('#logout').classList.remove('hidden');
+      refresh();
+      if (!started) { started = true; live(refresh); }
+    }
+
+    $('#pin-form').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const attempt = $('#pin').value.trim();
+      const res = await api('/api/staff/queue', { pin: attempt });
+      if (!res.ok) return $('#pin-err').classList.remove('hidden');
+      pin = attempt;
+      sessionStorage.setItem('navbat.pin', pin);
+      data = res.data;
+      document.querySelectorAll('[data-clinic]').forEach((el) => (el.textContent = data.name));
+      showBoard();
+    });
+
+    $('#logout').addEventListener('click', () => showPin());
+    $('#filter').addEventListener('change', () => {
+      const u = new URL(location.href);
+      $('#filter').value ? u.searchParams.set('doctor', $('#filter').value) : u.searchParams.delete('doctor');
+      history.replaceState(null, '', u);
+      render();
+    });
+
+    $('#grid').addEventListener('click', async (e) => {
+      const b = e.target.closest('button[data-act]');
+      if (!b) return;
+      if (b.dataset.act === 'no-show' && !confirm("Bemor kelmadi deb belgilansinmi?")) return;
+      b.disabled = true;
+      const res = await api(`/api/staff/doctors/${b.dataset.id}/${b.dataset.act}`, { method: 'POST', pin });
+      if (res.status === 401) return showPin(true);
+      refresh();
+    });
+    $('#grid').addEventListener('change', async (e) => {
+      const c = e.target.closest('input[data-act="pause"]');
+      if (!c) return;
+      await api(`/api/staff/doctors/${c.dataset.id}/pause`, { method: 'POST', pin, body: { paused: c.checked } });
+      refresh();
+    });
+
+    if (pin) {
+      loadClinicName();
+      showBoard();
+    } else {
+      showPin();
+    }
+  </script>
+</body>
+</html>

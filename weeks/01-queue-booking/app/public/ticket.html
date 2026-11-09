@@ -1,0 +1,173 @@
+<!doctype html>
+<html lang="uz">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Navbatingiz</title>
+  <link rel="stylesheet" href="/css/style.css">
+</head>
+<body>
+  <header class="top">
+    <div class="wrap">
+      <a class="logo" href="/" style="color:inherit;text-decoration:none">+</a>
+      <div>
+        <h1 data-clinic>Klinika</h1>
+        <p>Sizning navbatingiz</p>
+      </div>
+    </div>
+  </header>
+
+  <main class="wrap" style="padding-top:16px">
+    <div id="root" class="stack"><p class="muted">Yuklanmoqda…</p></div>
+    <footer>
+      <p><span class="sos">Ahvolingiz yomonlashsa, kutmang: 103 ga qo'ng'iroq qiling.</span></p>
+    </footer>
+  </main>
+
+  <script src="/js/common.js"></script>
+  <script>
+    const id = decodeURIComponent(location.pathname.split('/').pop());
+    const LEAVE_MINUTES = 30; // "set off now" when the estimated wait drops to this
+    const flagKey = (k) => `navbat.${id}.${k}`;
+    let audioCtx = null;
+
+    // ---- alerts: sound + vibration + system notification, each fired once per ticket
+    function beep() {
+      try {
+        audioCtx = audioCtx || new (window.AudioContext || window.webkitAudioContext)();
+        [0, 0.35, 0.7].forEach((t) => {
+          const o = audioCtx.createOscillator(), g = audioCtx.createGain();
+          o.frequency.value = 880; o.connect(g); g.connect(audioCtx.destination);
+          g.gain.setValueAtTime(0.25, audioCtx.currentTime + t);
+          g.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + t + 0.3);
+          o.start(audioCtx.currentTime + t); o.stop(audioCtx.currentTime + t + 0.3);
+        });
+      } catch {}
+    }
+    function alertOnce(kind, title, body) {
+      if (store.get(flagKey(kind))) return;
+      store.set(flagKey(kind), '1');
+      beep();
+      if (navigator.vibrate) navigator.vibrate([300, 150, 300, 150, 300]);
+      if ('Notification' in window && Notification.permission === 'granted') {
+        try { new Notification(title, { body, tag: `${id}-${kind}` }); } catch {}
+      }
+    }
+    async function enableAlerts() {
+      // Clicking also unlocks audio on mobile browsers.
+      audioCtx = audioCtx || new (window.AudioContext || window.webkitAudioContext)();
+      if ('Notification' in window && Notification.permission === 'default') await Notification.requestPermission();
+      store.set('navbat.alertsOn', '1');
+      render(last);
+    }
+
+    // ---- rendering
+    let last = null;
+
+    function alertsBlock() {
+      const supported = 'Notification' in window;
+      const granted = supported && Notification.permission === 'granted';
+      if (granted || store.get('navbat.alertsOn')) {
+        return `<div class="note info small">🔔 Navbatingiz yaqinlashganda shu sahifa ovoz va bildirishnoma bilan xabar beradi.
+          <b>Sahifani yopmang</b> (telefonni qulflasangiz bo'ladi).</div>`;
+      }
+      return `<button class="btn ghost block" id="enable">🔔 Ovozli eslatmani yoqish</button>`;
+    }
+
+    function render(t) {
+      last = t;
+      const root = $('#root');
+      if (!t) {
+        root.innerHTML = `<div class="card"><p>Navbat topilmadi. Havola noto'g'ri bo'lishi mumkin.</p>
+          <a class="btn block" href="/">Yangi navbat olish</a></div>`;
+        return;
+      }
+      const d = t.doctor;
+      const who = `${esc(d.specialty)} · ${esc(d.name)}`;
+
+      if (t.status === 'called') {
+        alertOnce('called', 'Navbatingiz keldi!', `${d.room}-xonaga kiring`);
+        root.innerHTML = `
+          <div class="card ticket state-called">
+            <div class="label">Navbatingiz keldi!</div>
+            <div class="code">${esc(t.code)}</div>
+            <div class="room">${esc(d.room)}-xonaga kiring</div>
+            <div class="muted" style="margin-top:6px">${who}</div>
+          </div>`;
+        return;
+      }
+
+      if (t.status !== 'waiting') {
+        const msg = {
+          done: ["Qabul yakunlandi", "Sog' bo'ling! Kerak bo'lsa, yana navbat olishingiz mumkin.", 'ok'],
+          cancelled: ['Navbat bekor qilindi', 'Kerak bo\'lsa, yangi navbat oling.', 'info'],
+          no_show: ['Navbatingiz o\'tib ketdi', 'Sizni chaqirishdi, lekin kelmadingiz. Yangi navbat olishingiz mumkin.', 'warn'],
+        }[t.status];
+        store.del('navbat.ticket');
+        root.innerHTML = `
+          <div class="card ticket">
+            <div class="label">${esc(t.code)} · ${who}</div>
+            <h2 style="margin:10px 0 4px">${msg[0]}</h2>
+            <p class="muted" style="margin:0">${msg[1]}</p>
+          </div>
+          <a class="btn block ${msg[2] === 'ok' ? 'ghost' : ''}" href="/">Yangi navbat olish</a>`;
+        return;
+      }
+
+      // waiting
+      const leaveNow = t.waitMinutes <= LEAVE_MINUTES || t.peopleAhead <= 1;
+      if (leaveNow && !d.paused) {
+        alertOnce('leave', "Klinikaga yo'lga chiqing", `Navbatingizgacha ${fmtWait(t.waitMinutes)} qoldi`);
+      }
+      const banner = d.paused
+        ? `<div class="note warn">Shifokor qabulni vaqtincha to'xtatdi. Navbatingiz saqlanadi.</div>`
+        : leaveNow
+          ? `<div class="note warn"><b>Yo'lga chiqish vaqti!</b> Navbatingizgacha ${fmtWait(t.waitMinutes)} qoldi.</div>`
+          : '';
+
+      root.innerHTML = `
+        ${banner}
+        <div class="card ticket">
+          <div class="label">Navbat raqamingiz</div>
+          <div class="code">${esc(t.code)}</div>
+          <div class="muted">${who} · ${esc(d.room)}-xona</div>
+          <div class="big-stats">
+            <div class="stat"><b>${t.peopleAhead}</b><span>sizdan oldin</span></div>
+            <div class="stat"><b>${fmtWait(t.waitMinutes)}</b><span>taxminan soat ${clockIn(t.waitMinutes)}</span></div>
+          </div>
+          <div class="line">Hozir qabulda: <b>${d.nowServing ?? '—'}</b> · O'rtacha qabul: <b>${d.avgMinutes} daq</b></div>
+        </div>
+        ${alertsBlock()}
+        <div class="card small">
+          <div class="muted">Ism</div><div>${esc(t.name)}</div>
+          <div class="muted" style="margin-top:8px">Shikoyat</div><div>${esc(t.issue)}</div>
+          <div class="muted" style="margin-top:8px">Navbat olingan</div><div>soat ${fmtClock(t.createdAt)}</div>
+        </div>
+        <button class="btn ghost block" id="copy">🔗 Havolani nusxalash</button>
+        <button class="btn danger-ghost block" id="cancel">Navbatni bekor qilish</button>`;
+    }
+
+    async function refresh() {
+      const { ok, status, data } = await api(`/api/tickets/${encodeURIComponent(id)}`);
+      if (ok) render(data);
+      else if (status === 404) render(null);
+    }
+
+    $('#root').addEventListener('click', async (e) => {
+      if (e.target.id === 'enable') enableAlerts();
+      if (e.target.id === 'copy') {
+        try { await navigator.clipboard.writeText(location.href); e.target.textContent = '✓ Nusxalandi'; } catch {}
+      }
+      if (e.target.id === 'cancel' && confirm('Navbatni bekor qilasizmi?')) {
+        const { ok, data } = await api(`/api/tickets/${encodeURIComponent(id)}/cancel`, { method: 'POST' });
+        if (ok) render(data);
+      }
+    });
+
+    store.set('navbat.ticket', id);
+    loadClinicName();
+    refresh();
+    live(refresh);
+  </script>
+</body>
+</html>

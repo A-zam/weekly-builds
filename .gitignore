@@ -26,3 +26,8 @@ venv/
 *.pth
 *.ckpt
 data/raw/
+
+# App databases
+*.db
+*.db-wal
+*.db-shm

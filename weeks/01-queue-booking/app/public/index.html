@@ -1,0 +1,199 @@
+<!doctype html>
+<html lang="uz">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Navbatga yozilish</title>
+  <link rel="stylesheet" href="/css/style.css">
+</head>
+<body>
+  <header class="top">
+    <div class="wrap">
+      <div class="logo">+</div>
+      <div>
+        <h1 data-clinic>Klinika</h1>
+        <p>Shifokor qabuliga onlayn navbat</p>
+      </div>
+    </div>
+  </header>
+
+  <main class="wrap">
+    <div id="mine" class="hidden" style="margin-top:16px"></div>
+
+    <!-- Step 1: choose a doctor -->
+    <section id="step-doctor">
+      <h2>Shifokorni tanlang</h2>
+      <p class="muted small" style="margin-top:-6px">
+        Uydan navbat oling va navbatingiz yaqinlashganda yo'lga chiqing: koridorda kutib o'tirmaysiz.
+      </p>
+      <div id="doctors" class="stack"><p class="muted">Yuklanmoqda…</p></div>
+    </section>
+
+    <!-- Step 2: details -->
+    <section id="step-form" class="hidden">
+      <h2>Ma'lumotlaringiz</h2>
+      <form id="form" class="card" novalidate>
+        <div class="chosen" style="margin-bottom:16px">
+          <div><b id="chosen-spec"></b> <span class="muted small" id="chosen-name"></span></div>
+          <button type="button" class="linkbtn" id="change">O'zgartirish</button>
+        </div>
+
+        <div class="field" data-f="name">
+          <label for="name">Ism va familiya</label>
+          <input class="input" id="name" name="name" autocomplete="name" maxlength="60" placeholder="Masalan: Aziz Rahimov">
+          <div class="err hidden">Ismingizni kiriting</div>
+        </div>
+
+        <div class="field" data-f="phone">
+          <label for="phone">Telefon raqam</label>
+          <div class="phone">
+            <span class="cc">+998</span>
+            <input class="input" id="phone" name="phone" inputmode="tel" autocomplete="tel-national" placeholder="90 123 45 67" maxlength="20">
+          </div>
+          <div class="err hidden">Raqamni to'liq kiriting: 9 ta raqam</div>
+        </div>
+
+        <div class="field" data-f="issue">
+          <label for="issue">Nima bezovta qilyapti?</label>
+          <textarea class="input" id="issue" name="issue" maxlength="500" placeholder="Masalan: 3 kundan beri bosh og'riyapti, harorat 37.8"></textarea>
+          <div class="hint">Qisqacha yozing, shifokor oldindan tayyorlanadi.</div>
+          <div class="err hidden">Shikoyatingizni qisqacha yozing</div>
+        </div>
+
+        <div id="form-error" class="note danger hidden" style="margin-top:16px"></div>
+
+        <button class="btn block" id="submit" style="margin-top:20px">Navbat olish</button>
+        <p class="hint" style="text-align:center">Ma'lumotlaringizni faqat klinika xodimlari ko'radi.</p>
+      </form>
+    </section>
+
+    <footer>
+      <p><span class="sos">Shoshilinch holatda 103 ga qo'ng'iroq qiling.</span> Onlayn navbat shoshilinch yordam uchun emas.</p>
+      <p id="demo-note" class="hidden">Bu namunaviy (demo) versiya: barcha ism va raqamlar o'ylab topilgan. Haqiqiy ma'lumot kiritmang.
+        Xodimlar paneli: <a href="/staff">/staff</a></p>
+    </footer>
+  </main>
+
+  <script src="/js/common.js"></script>
+  <script>
+    let clinic = null;
+    let chosen = null;
+
+    const ERRORS = {
+      already_booked: "Bu telefon raqami bilan bugun allaqachon navbat olingan. Avvalgi navbatingiz havolasini oching.",
+      paused: "Bu shifokor hozir yangi bemorlarni qabul qilmayapti. Boshqa shifokorni tanlang.",
+      no_doctor: "Shifokor topilmadi. Sahifani yangilang.",
+      network: "Internet aloqasi yo'q. Qaytadan urinib ko'ring.",
+    };
+
+    function doctorCard(d) {
+      const status = d.paused
+        ? `<span class="badge warn">Qabul to'xtatilgan</span>`
+        : `<span class="badge">${esc(d.room)}-xona</span>`;
+      return `
+        <article class="card doctor">
+          <div class="doctor-head">
+            <div><h3>${esc(d.specialty)}</h3><div class="who">${esc(d.name)}</div></div>
+            ${status}
+          </div>
+          <div class="stats">
+            <div class="stat"><b>${d.waitingCount}</b><span>navbatda</span></div>
+            <div class="stat"><b>${d.paused ? '—' : fmtWait(d.waitForNewMinutes)}</b><span>kutish</span></div>
+            <div class="stat"><b>${d.nowServing ?? '—'}</b><span>hozir qabulda</span></div>
+          </div>
+          <button class="btn block" data-doctor="${d.id}" ${d.paused ? 'disabled' : ''}>Navbatga yozilish</button>
+        </article>`;
+    }
+
+    async function refresh() {
+      const { ok, data } = await api('/api/clinic');
+      if (!ok) return;
+      clinic = data;
+      document.querySelectorAll('[data-clinic]').forEach((el) => (el.textContent = data.name));
+      $('#demo-note').classList.toggle('hidden', !data.demo);
+      $('#doctors').innerHTML = data.doctors.map(doctorCard).join('');
+    }
+
+    // A returning patient sees their active ticket at the top.
+    async function showMine() {
+      const id = store.get('navbat.ticket');
+      if (!id) return;
+      const { ok, data } = await api(`/api/tickets/${encodeURIComponent(id)}`);
+      if (!ok || !['waiting', 'called'].includes(data.status)) { store.del('navbat.ticket'); return; }
+      const el = $('#mine');
+      el.innerHTML = `<a class="note info" style="display:block;text-decoration:none" href="/t/${encodeURIComponent(id)}">
+        Sizda faol navbat bor: <b>${esc(data.code)}</b> · ${esc(data.doctor.specialty)}. Ko'rish →</a>`;
+      el.classList.remove('hidden');
+    }
+
+    function choose(id) {
+      chosen = clinic.doctors.find((d) => d.id === id);
+      if (!chosen) return;
+      $('#chosen-spec').textContent = chosen.specialty;
+      $('#chosen-name').textContent = chosen.name;
+      $('#step-doctor').classList.add('hidden');
+      $('#step-form').classList.remove('hidden');
+      window.scrollTo(0, 0);
+      $('#name').focus();
+    }
+
+    $('#doctors').addEventListener('click', (e) => {
+      const b = e.target.closest('[data-doctor]');
+      if (b) choose(Number(b.dataset.doctor));
+    });
+    $('#change').addEventListener('click', () => {
+      $('#step-form').classList.add('hidden');
+      $('#step-doctor').classList.remove('hidden');
+    });
+
+    // Format phone as "90 123 45 67" while typing.
+    $('#phone').addEventListener('input', (e) => {
+      // People often type the country code too: "998 90 ..." → drop it once there are more than 9 digits.
+      let d = e.target.value.replace(/\D/g, '').slice(0, 12);
+      if (d.length > 9 && d.startsWith('998')) d = d.slice(3);
+      d = d.slice(0, 9);
+      e.target.value = [d.slice(0, 2), d.slice(2, 5), d.slice(5, 7), d.slice(7, 9)].filter(Boolean).join(' ');
+    });
+
+    function setInvalid(fields) {
+      for (const el of document.querySelectorAll('.field[data-f]')) {
+        const bad = !!fields[el.dataset.f];
+        el.classList.toggle('invalid', bad);
+        el.querySelector('.err').classList.toggle('hidden', !bad);
+      }
+    }
+
+    $('#form').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const body = {
+        doctorId: chosen.id,
+        name: $('#name').value.trim(),
+        phone: $('#phone').value,
+        issue: $('#issue').value.trim(),
+      };
+      const fields = {};
+      if (body.name.length < 2) fields.name = true;
+      if (body.phone.replace(/\D/g, '').length !== 9) fields.phone = true;
+      if (body.issue.length < 3) fields.issue = true;
+      setInvalid(fields);
+      $('#form-error').classList.add('hidden');
+      if (Object.keys(fields).length) return;
+
+      $('#submit').disabled = true;
+      const { ok, data } = await api('/api/tickets', { method: 'POST', body });
+      $('#submit').disabled = false;
+      if (ok) {
+        store.set('navbat.ticket', data.id);
+        location.href = `/t/${encodeURIComponent(data.id)}`;
+        return;
+      }
+      if (data.error === 'invalid') return setInvalid(data.fields || {});
+      $('#form-error').textContent = ERRORS[data.error] || "Xatolik yuz berdi. Qaytadan urinib ko'ring.";
+      $('#form-error').classList.remove('hidden');
+    });
+
+    refresh().then(showMine);
+    live(refresh);
+  </script>
+</body>
+</html>
