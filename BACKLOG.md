@@ -56,4 +56,4 @@ This is the idea pool. Add to it anytime, and when an idea gets built, move it t
 ---
 
 ## ✅ Built
-- **Online Queue Booking** → [Week 01: QueueUp](weeks/01-queue-booking) 🔨
+- **Online Queue Booking** → [Week 01: Navbat](weeks/01-queue-booking) 🔨

@@ -10,7 +10,7 @@ This isn't a "look how well I write code" portfolio. It shows **AI engineering**
 
 | # | Week | Project | Category | Mode | Status | Demo |
 |---|------|---------|----------|------|--------|------|
-| 01 | Nov 9 – Nov 15, 2026 | [QueueUp](weeks/01-queue-booking): virtual queue for walk-in businesses | 🏙️ Real-life | 🤖 Autopilot | 🔨 building | — |
+| 01 | Nov 9 – Nov 15, 2026 | [Navbat](weeks/01-queue-booking): online clinic queue, book from home (Uzbek) | 🏙️ Real-life | 🤖 Autopilot | 🔨 building | — |
 
 **Status:** 🗳️ choosing · 🔨 building · ✅ shipped · 🧊 frozen (stopped on purpose, and the retro says why)
 
