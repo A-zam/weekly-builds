@@ -49,7 +49,6 @@ This is the idea pool. Add to it anytime, and when an idea gets built, move it t
 ## 🏙️ Real-life solutions
 | Idea | One-liner | Mode | Effort |
 |------|-----------|------|--------|
-| Online Queue Booking | Barbershop/clinic: customers take a virtual ticket, see live position and ETA | 📐 | ●● |
 | Restaurant Waitlist | Host adds walk-ins, guests get a "your table is ready" link | 🤖 | ●● |
 | Household Chores Rotator | Fair chore rotation for flatmates, with streaks | 🤖 | ● |
 | Event RSVP Page | One link: event info, RSVP, headcount, dietary needs | 🤖 | ● |
@@ -57,4 +56,4 @@ This is the idea pool. Add to it anytime, and when an idea gets built, move it t
 ---
 
 ## ✅ Built
-_(Nothing yet. Week 01 starts now.)_
+- **Online Queue Booking** → [Week 01: QueueUp](weeks/01-queue-booking) 🔨
