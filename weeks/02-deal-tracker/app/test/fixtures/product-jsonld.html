@@ -1,0 +1,44 @@
+<!doctype html>
+<html><head>
+<title>Fixture: hand-written product page (not copied from any store)</title>
+<script type="application/ld+json">{"@context":"https://schema.org","@type":"Organization","name":"Example Shop"}</script>
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "Product",
+  "name": "Example Phone X 128GB",
+  "sku": "EX-128",
+  "brand": {"@type": "Brand", "name": "ExampleBrand"},
+  "image": ["https://shop.example/img/x.jpg"],
+  "offers": {
+    "@type": "Offer",
+    "url": "/p/example-phone-x",
+    "priceCurrency": "UZS",
+    "price": "3 490 000",
+    "availability": "https://schema.org/InStock",
+    "priceSpecification": [
+      {"@type": "UnitPriceSpecification", "price": 3490000, "priceCurrency": "UZS"},
+      {"@type": "UnitPriceSpecification", "priceType": "https://schema.org/StrikethroughPrice", "price": 4990000, "priceCurrency": "UZS"}
+    ]
+  }
+}
+</script>
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@graph": [
+    {"@type": "ItemList", "itemListElement": [
+      {"@type": "ListItem", "position": 1, "item": {"@type": "Product", "name": "Example Kettle", "productID": "K-1",
+        "url": "https://shop.example/p/kettle",
+        "offers": {"@type": "Offer", "price": 289000, "priceCurrency": "UZS", "availability": "https://schema.org/OutOfStock"}}},
+      {"@type": "ListItem", "position": 2, "item": {"@type": "Product", "name": "Priced in dollars", "sku": "USD-1",
+        "url": "https://shop.example/p/usd",
+        "offers": {"@type": "Offer", "price": 99, "priceCurrency": "USD"}}},
+      {"@type": "ListItem", "position": 3, "item": {"@type": "Product", "name": "No price yet", "sku": "NP-1",
+        "url": "https://shop.example/p/np", "offers": {"@type": "Offer"}}}
+    ]}
+  ]
+}
+</script>
+<script type="application/ld+json">{ this block is broken JSON and must be skipped }</script>
+</head><body></body></html>

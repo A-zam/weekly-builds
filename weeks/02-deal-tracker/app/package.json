@@ -1,0 +1,13 @@
+{
+  "name": "chegirma",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Tracks daily prices at Uzbek online stores and tells real discounts from fake ones.",
+  "engines": { "node": ">=22.5" },
+  "scripts": {
+    "scrape": "node --disable-warning=ExperimentalWarning src/scrape.js",
+    "deals": "node --disable-warning=ExperimentalWarning src/deals.js",
+    "demo": "node --disable-warning=ExperimentalWarning src/demo.js",
+    "test": "node --disable-warning=ExperimentalWarning --test \"test/*.test.js\""
+  }
+}

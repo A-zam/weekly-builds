@@ -11,6 +11,7 @@ This isn't a "look how well I write code" portfolio. It shows **AI engineering**
 | # | Week | Project | Category | Mode | Status | Demo |
 |---|------|---------|----------|------|--------|------|
 | 01 | Nov 9 – Nov 15, 2026 | [Navbat](weeks/01-queue-booking): online clinic queue, book from home (Uzbek) | 🏙️ Real-life | 🤖 Autopilot | 🔨 building | — |
+| 02 | Nov 16 – Nov 22, 2026 | [Chegirma](weeks/02-deal-tracker): is that sale discount real? Price history for Uzbek stores | 💼 Micro-SaaS | 🤖 Autopilot | 🔨 building | — |
 
 **Status:** 🗳️ choosing · 🔨 building · ✅ shipped · 🧊 frozen (stopped on purpose, and the retro says why)
 

@@ -57,3 +57,4 @@ This is the idea pool. Add to it anytime, and when an idea gets built, move it t
 
 ## ✅ Built
 - **Online Queue Booking** → [Week 01: Navbat](weeks/01-queue-booking) 🔨
+- **Seasonal Bargain Hunter (Uzbekistan)** → [Week 02: Chegirma](weeks/02-deal-tracker) 🔨
