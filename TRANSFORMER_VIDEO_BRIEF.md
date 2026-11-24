@@ -41,17 +41,41 @@ Timings are targets. Final timing should follow the generated TTS audio.
 
 | # | Time | Beat | Narration (VO) | On-screen caption |
 |---|---|---|---|---|
-| 1 | 0–6 s | **Hook** | "Your wall socket gives 230 volts AC. Your electronics want a few volts DC. The part that bridges that gap? A transformer." | `230 V AC → 12 V DC` |
-| 2 | 6–13 s | **AC keeps changing** | "Mains current isn't steady. It swings back and forth fifty times every second." | `50 Hz` |
+| 1 | 0–5 s | **Hook** (see 2.1) | "Your wall pushes 230 volts. Your phone would fry at a fraction of that. This tiny part is what saves it… and it isn't even wired to your phone." | `230 V` vs `5 V`, then `not even connected?` |
+| 2 | 5–13 s | **AC keeps changing** | "To see how, let's open up a bigger one. Mains current isn't steady. It swings back and forth fifty times every second." | `50 Hz` |
 | 3 | 13–21 s | **Current → magnetic field** | "Send current through a coil and you get a magnetic field. As the current reverses, the field grows, collapses and flips." | — |
 | 4 | 21–29 s | **Induction** | "Place a second coil nearby, and that changing field pushes a voltage into it, with no wire between them. Feed it steady DC… and nothing. It only works with change." | `DC → 0 V` |
 | 5 | 29–35 s | **Iron core** | "An iron core guides the field from one coil to the other, so almost none of it is wasted." | `laminated iron core` |
 | 6 | 35–43 s | **Turns ratio** | "The trick is in the turns. 1,150 turns in, 60 turns out: 230 volts becomes 12." | `Vs / Vp = Ns / Np` · `230 × 60/1150 ≈ 12 V` |
 | 7 | 43–48 s | **Power conserved** | "Voltage goes down, current goes up. The power stays almost the same." | `Vp·Ip ≈ Vs·Is` |
-| 8 | 48–51 s | **Isolation** | "And the coils never touch, keeping you safely apart from mains." | `isolated` |
+| 8 | 48–51 s | **Isolation** (pays off the hook) | "And remember: the coils never touch. Only magnetism crosses the gap. That's what keeps mains away from you." | `no wire. just magnetism.` |
 | 9 | 51–56 s | **Rest of the PSU** | "A rectifier, a capacitor and a regulator then smooth it into clean DC." | `AC → rectifier → capacitor → regulator → DC` |
-| 10 | 56–63 s | **Why chargers are tiny** | "Your phone charger does the same trick at a hundred thousand cycles a second, so its transformer fits on your fingertip." | `50 Hz → 100 kHz` |
+| 10 | 56–63 s | **Back to the phone** (closes the loop) | "And that tiny part in your charger? Same trick, a hundred thousand times a second. That's why it fits on your fingertip." | `50 Hz → 100 kHz` |
 | 11 | 63–65 s | **End card** | (no VO, or "That's the transformer.") | 3 recap lines (section 4.6) |
+
+### 2.1 The hook (0–5 s)
+
+The first 2 seconds decide whether people keep watching. The hook uses **stakes** (your phone getting fried) followed by a **curiosity gap** (it isn't even wired to the phone). The gap is answered in beat 8, and the tiny part comes back in beat 10, so the video ends where it began.
+
+**Rules for the hook:**
+- Motion starts on **frame 1**: no fade-in from black, no title card, no logo.
+- The first words are on screen by **0.5 s** and synced to the VO.
+- The **first frame works as the thumbnail** (it's frame `01-hook.png`).
+- The first VO line takes **2.5 s or less**.
+
+**Hook shot plan:**
+
+| Time | Picture | VO |
+|---|---|---|
+| 0.0–1.2 s | Extreme close-up of a phone's charging port. `230 V` slams in, orange, huge. The screen glitches and sparks flash red (the "what if"). | "Your wall pushes 230 volts." |
+| 1.2–2.4 s | Freeze, then rewind. A small `5 V` appears in cyan next to the oversized `230 V`. | "Your phone would fry at a fraction of that." |
+| 2.4–3.8 s | Fast pull-back through a charger shell that cuts open (x-ray). A tiny ferrite transformer glows. | "This tiny part is what saves it…" |
+| 3.8–5.0 s | The two coil windings separate slightly, with a visible gap and a `?`. Caption: `not even connected?` | "…and it isn't even wired to your phone." |
+
+**Other hook lines (same structure; swap in if the owner prefers):**
+1. "Plug your phone straight into the wall and it's dead instantly. This is why it isn't."
+2. "Your wall socket has 46 times the voltage your phone can take. One tiny part fixes that."
+3. "There's no wire connecting your phone to the wall. Seriously." (pure curiosity, with no stakes up front)
 
 ---
 
@@ -63,7 +87,8 @@ Timings are targets. Final timing should follow the generated TTS audio.
 - Flux flows in a **closed loop through the core**. Primary and secondary sit on the same core, usually on opposite limbs in the diagram.
 - Primary and secondary sine waves are **in phase** (ideal transformer, dot convention) and differ only in amplitude. Do not show a phase shift.
 - Laminations reduce **eddy currents** (heat), not "leakage". Mention eddy currents only if the label fits.
-- A phone charger does **not** use a 50 Hz transformer. It rectifies mains to high-voltage DC, switches it at roughly 100 kHz through a small **ferrite** transformer, then rectifies to 5 V. Beat 1 talks about "electronics" in general, and beats 2–9 use a **12 V device** (for example a router or LED strip), so the story stays correct.
+- A phone charger does **not** use a 50 Hz transformer. It rectifies mains to high-voltage DC, switches it at roughly 100 kHz through a small **ferrite** transformer, then rectifies to 5 V. So the hook shows a **ferrite** transformer inside the charger. Beats 2–9 explain the principle on a classic 50 Hz transformer with a **12 V** output ("let's open up a bigger one"), and beat 10 brings back the ferrite one. Never show 12 V going into the phone.
+- Hook claims and why they hold: a phone's 5 V USB input is far below 230 V (≈ 46×), so connecting it directly would destroy it. In an isolated charger, energy crosses from primary to secondary **only through the transformer's magnetic field**; there is no conductive path. Say "isn't wired to your phone", not "not connected to anything". Keep the 230 V reference (EU/Asia mains); if the owner targets the US, use 120 V and "24 times".
 - Why higher frequency means a smaller core: for the same voltage, the needed core area × turns falls as frequency rises (V ≈ 4.44·f·N·A·B). On screen, a simple size comparison is enough.
 - Rectified waveform order: sine → full-wave (all humps positive) → ripple DC (after capacitor) → flat line (after regulator).
 
@@ -73,8 +98,8 @@ Timings are targets. Final timing should follow the generated TTS audio.
 
 Each moment is one frame, the same 5 for every skill. Name the files `01-hook.png` … `05-tiny-charger.png`.
 
-### 4.1 `01-hook.png`: beat 1
-Wall socket at the top with a `230 V AC` sine glyph. A 12 V device (router/LED strip) at the bottom with `12 V DC` (flat line). Between them, the power-supply chain as a vertical stack of 4 blocks: **Transformer → Rectifier → Filter → Regulator**. The **Transformer** block is highlighted or glowing, and the others are dimmed.
+### 4.1 `01-hook.png`: beat 1, the 0.0–1.2 s moment (also the thumbnail)
+Extreme close-up of a phone's charging port at the moment of the "what if": a huge orange `230 V` crashing into it, red sparks, and the phone screen glitching. A small cyan `5 V` label nearby makes the mismatch obvious. It should read in under a second at thumbnail size, with no paragraph of text. (Section 2.1 describes the full hook. The beat 9 power-supply block chain is no longer in the hook.)
 
 ### 4.2 `02-field.png`: beat 3
 A single coil (primary, orange) with current dots moving along the wire. Magnetic field lines (yellow-green) loop around it, caught mid-growth. A small inset sine wave in the corner has a playhead marking the current point in the cycle.
