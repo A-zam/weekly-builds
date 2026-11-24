@@ -1,0 +1,1285 @@
+<title>Habit Arena</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,800&family=Figtree:wght@400;500;600;700&family=JetBrains+Mono:wght@500;700&display=swap">
+<style>
+/* Layout: a track meet. Rooms are heats, the leaderboard is a set of lanes, XP is gold. */
+:root {
+  --bg: #EEF1F5;
+  --surface: #FFFFFF;
+  --surface-2: #F6F8FB;
+  --ink: #111620;
+  --muted: #5A6476;
+  --line: #DCE1E9;
+  --accent: #2B55F0;
+  --accent-soft: #E3E9FF;
+  --accent-ink: #FFFFFF;
+  --xp: #C98A00;
+  --xp-bright: #F4B400;
+  --xp-soft: #FFF2CC;
+  --good: #16935A;
+  --flame: #F0602A;
+  --danger: #C8343B;
+  --lane: #C9D1DD;
+  --shadow: 0 1px 2px rgba(17,22,32,.06), 0 8px 24px -12px rgba(17,22,32,.18);
+  --f-display: "Bricolage Grotesque", "Avenir Next", "Segoe UI", system-ui, sans-serif;
+  --f-body: "Figtree", "Segoe UI", system-ui, -apple-system, sans-serif;
+  --f-mono: "JetBrains Mono", ui-monospace, "SFMono-Regular", Menlo, monospace;
+  --r: 14px;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #0C1017; --surface: #151B26; --surface-2: #1B2230; --ink: #E8ECF4; --muted: #96A0B3;
+    --line: #283142; --accent: #6E8CFF; --accent-soft: #1E2949; --accent-ink: #0C1017;
+    --xp: #FFC53D; --xp-bright: #FFC53D; --xp-soft: #3A2E10; --good: #3BC985; --flame: #FF8048;
+    --danger: #FF6B70; --lane: #344055; --shadow: 0 1px 2px rgba(0,0,0,.3), 0 10px 28px -14px rgba(0,0,0,.6);
+    color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --bg: #0C1017; --surface: #151B26; --surface-2: #1B2230; --ink: #E8ECF4; --muted: #96A0B3;
+  --line: #283142; --accent: #6E8CFF; --accent-soft: #1E2949; --accent-ink: #0C1017;
+  --xp: #FFC53D; --xp-bright: #FFC53D; --xp-soft: #3A2E10; --good: #3BC985; --flame: #FF8048;
+  --danger: #FF6B70; --lane: #344055; --shadow: 0 1px 2px rgba(0,0,0,.3), 0 10px 28px -14px rgba(0,0,0,.6);
+  color-scheme: dark;
+}
+
+* { box-sizing: border-box; }
+body { background: var(--bg); color: var(--ink); font: 15px/1.5 var(--f-body); -webkit-font-smoothing: antialiased; }
+button, input, select, textarea { font: inherit; color: inherit; }
+button { cursor: pointer; }
+:focus-visible { outline: 2.5px solid var(--accent); outline-offset: 2px; border-radius: 8px; }
+h1, h2, h3 { font-family: var(--f-display); margin: 0; line-height: 1.1; text-wrap: balance; letter-spacing: -0.01em; }
+.mono { font-family: var(--f-mono); font-variant-numeric: tabular-nums; }
+.muted { color: var(--muted); }
+.wrap { max-width: 1140px; margin: 0 auto; padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px)); }
+
+/* top bar */
+.top { position: sticky; top: env(safe-area-inset-top, 0px); z-index: 20; background: color-mix(in srgb, var(--bg) 88%, transparent); backdrop-filter: blur(10px); border-bottom: 1px solid var(--line); }
+body::before { content: ""; position: fixed; inset: 0 0 auto; height: env(safe-area-inset-top, 0px); z-index: 10; background: var(--bg); }
+.top .wrap { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding-block: 10px; }
+.brand { display: flex; align-items: center; gap: 10px; text-decoration: none; color: var(--ink); }
+.brand-mark { width: 30px; height: 30px; flex: none; }
+.brand-name { font-family: var(--f-display); font-weight: 800; font-size: 19px; letter-spacing: -0.02em; }
+.me-chip { display: flex; align-items: center; gap: 8px; border: 1px solid var(--line); background: var(--surface); border-radius: 999px; padding: 4px 12px 4px 4px; min-width: 0; }
+.me-chip span { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 140px; font-weight: 600; font-size: 14px; }
+.avatar { width: 28px; height: 28px; border-radius: 50%; flex: none; object-fit: cover; background: var(--line); }
+.avatar.lg { width: 44px; height: 44px; }
+
+main { padding-block: 22px 64px; }
+
+/* buttons */
+.btn { display: inline-flex; align-items: center; justify-content: center; gap: 8px; border: 1px solid var(--line); background: var(--surface); border-radius: 10px; padding: 9px 14px; font-weight: 600; font-size: 14px; white-space: nowrap; }
+.btn:hover { border-color: color-mix(in srgb, var(--accent) 45%, var(--line)); }
+.btn.primary { background: var(--accent); border-color: var(--accent); color: var(--accent-ink); }
+.btn.primary:hover { filter: brightness(1.06); }
+.btn.ghost { background: transparent; border-color: transparent; color: var(--muted); }
+.btn.ghost:hover { color: var(--ink); background: var(--surface-2); }
+.btn.danger { color: var(--danger); }
+.btn.sm { padding: 6px 10px; font-size: 13px; border-radius: 8px; }
+.btn[disabled] { opacity: .5; cursor: not-allowed; }
+.btn svg { width: 16px; height: 16px; flex: none; }
+.linkish { background: none; border: 0; padding: 0; color: var(--accent); font-weight: 600; text-decoration: underline; text-underline-offset: 3px; }
+
+.card { background: var(--surface); border: 1px solid var(--line); border-radius: var(--r); box-shadow: var(--shadow); }
+.panel { padding: 18px; display: flex; flex-direction: column; gap: 14px; min-width: 0; }
+.panel-head { display: flex; align-items: baseline; justify-content: space-between; gap: 10px; flex-wrap: wrap; }
+.eyebrow { font-size: 12px; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; color: var(--muted); }
+.notice { border: 1px dashed var(--line); border-radius: 12px; padding: 12px 14px; color: var(--muted); font-size: 14px; background: var(--surface-2); }
+.notice.warn { border-style: solid; border-color: color-mix(in srgb, var(--xp) 50%, var(--line)); background: var(--xp-soft); color: var(--ink); }
+
+/* lobby */
+.lobby { display: grid; grid-template-columns: minmax(0, 1.5fr) minmax(0, 1fr); gap: 20px; align-items: start; }
+.hero h1 { font-size: clamp(30px, 5vw, 46px); font-weight: 800; letter-spacing: -0.03em; }
+.hero p { max-width: 52ch; color: var(--muted); margin: 10px 0 0; font-size: 16px; }
+.hero { padding-block: 6px 18px; }
+.rooms { display: grid; gap: 12px; }
+.room-card { display: grid; grid-template-columns: auto minmax(0,1fr) auto; gap: 14px; align-items: center; padding: 14px 16px; text-decoration: none; color: inherit; }
+.room-card:hover { border-color: color-mix(in srgb, var(--accent) 40%, var(--line)); }
+.room-badge { width: 46px; height: 46px; border-radius: 12px; display: grid; place-items: center; font-family: var(--f-display); font-weight: 800; font-size: 20px; color: var(--accent-ink); background: var(--accent); }
+.room-card h3 { font-size: 18px; overflow-wrap: anywhere; }
+.room-meta { font-size: 13px; color: var(--muted); display: flex; gap: 10px; flex-wrap: wrap; }
+.room-xp { text-align: right; }
+.room-xp b { font-family: var(--f-mono); font-size: 18px; color: var(--xp); display: block; }
+.room-xp small { color: var(--muted); font-size: 12px; }
+.side { display: grid; gap: 16px; }
+.join-row { display: flex; gap: 8px; }
+.join-row input { flex: 1; min-width: 0; text-transform: uppercase; letter-spacing: .2em; font-family: var(--f-mono); font-weight: 700; }
+.steps { list-style: none; margin: 0; padding: 0; display: grid; gap: 12px; }
+.steps li { display: grid; grid-template-columns: 26px minmax(0,1fr); gap: 10px; font-size: 14px; }
+.steps .n { width: 26px; height: 26px; border-radius: 50%; background: var(--accent-soft); color: var(--accent); display: grid; place-items: center; font-weight: 700; font-size: 13px; }
+
+/* form controls */
+.field { display: grid; gap: 6px; }
+.field > span, .label { font-size: 13px; font-weight: 600; }
+.input, input[type=text], input[type=date], select, textarea { width: 100%; border: 1px solid var(--line); background: var(--surface-2); border-radius: 10px; padding: 10px 12px; min-width: 0; }
+.input:focus, input:focus, select:focus, textarea:focus { outline: 2px solid var(--accent); outline-offset: 0; border-color: transparent; }
+textarea { resize: vertical; min-height: 84px; }
+.row { display: flex; gap: 10px; flex-wrap: wrap; align-items: center; }
+.grid2 { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+.chips { display: flex; flex-wrap: wrap; gap: 6px; }
+.chip { border: 1px solid var(--line); background: var(--surface); border-radius: 999px; padding: 5px 11px; font-size: 13px; font-weight: 600; }
+.chip[aria-pressed="true"] { background: var(--accent); border-color: var(--accent); color: var(--accent-ink); }
+.chip.suggest { border-style: dashed; color: var(--muted); }
+.toggle { display: grid; grid-template-columns: minmax(0,1fr) auto; gap: 12px; align-items: center; padding: 12px 14px; border: 1px solid var(--line); border-radius: 12px; background: var(--surface-2); }
+.toggle small { display: block; color: var(--muted); font-size: 13px; }
+.switch { position: relative; width: 44px; height: 26px; flex: none; }
+.switch input { position: absolute; inset: 0; opacity: 0; margin: 0; cursor: pointer; }
+.switch i { position: absolute; inset: 0; border-radius: 999px; background: var(--lane); transition: background .15s; pointer-events: none; }
+.switch i::after { content: ""; position: absolute; top: 3px; left: 3px; width: 20px; height: 20px; border-radius: 50%; background: #fff; transition: transform .15s; box-shadow: 0 1px 2px rgba(0,0,0,.25); }
+.switch input:checked + i { background: var(--accent); }
+.switch input:checked + i::after { transform: translateX(18px); }
+.switch input:focus-visible + i { outline: 2.5px solid var(--accent); outline-offset: 2px; }
+.habit-edit { display: grid; grid-template-columns: 64px minmax(0,1fr) auto; gap: 8px; align-items: center; }
+.habit-edit select { padding: 9px 6px; font-size: 18px; text-align: center; }
+.form { display: grid; gap: 18px; max-width: 640px; }
+.form-section { display: grid; gap: 10px; }
+
+/* room */
+.room-head { display: grid; gap: 14px; margin-bottom: 18px; }
+.room-title { display: flex; align-items: flex-start; justify-content: space-between; gap: 12px; flex-wrap: wrap; }
+.room-title h1 { font-size: clamp(26px, 4.4vw, 38px); font-weight: 800; letter-spacing: -0.025em; overflow-wrap: anywhere; }
+.crumbs { display: flex; gap: 6px; align-items: center; font-size: 13px; color: var(--muted); margin-bottom: 6px; }
+.crumbs a { color: var(--muted); text-decoration: none; display: inline-flex; align-items: center; gap: 4px; }
+.crumbs a:hover { color: var(--ink); }
+.head-actions { display: flex; gap: 8px; flex-wrap: wrap; }
+.code-chip { font-family: var(--f-mono); font-weight: 700; letter-spacing: .14em; }
+.season { display: grid; gap: 8px; }
+.season-line { display: flex; justify-content: space-between; gap: 10px; flex-wrap: wrap; font-size: 14px; }
+.season-line b { font-family: var(--f-display); font-weight: 800; font-size: 16px; }
+.ticks { display: flex; gap: 3px; height: 10px; }
+.ticks i { flex: 1; border-radius: 3px; background: var(--lane); min-width: 2px; }
+.ticks i.past { background: var(--accent); }
+.ticks i.now { background: var(--xp-bright); }
+.bar { height: 10px; border-radius: 999px; background: var(--lane); overflow: hidden; }
+.bar > i { display: block; height: 100%; background: var(--accent); border-radius: inherit; }
+.bar.gold > i { background: linear-gradient(90deg, var(--xp), var(--xp-bright)); }
+
+.room-grid { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1.25fr); gap: 20px; align-items: start; }
+.col { display: grid; gap: 20px; min-width: 0; }
+
+.seg { display: inline-flex; border: 1px solid var(--line); border-radius: 10px; padding: 3px; background: var(--surface-2); }
+.seg button { border: 0; background: transparent; padding: 5px 12px; border-radius: 7px; font-size: 13px; font-weight: 600; color: var(--muted); }
+.seg button[aria-pressed="true"] { background: var(--surface); color: var(--ink); box-shadow: 0 1px 2px rgba(0,0,0,.12); }
+
+.habits { display: grid; gap: 8px; }
+.habit { display: grid; grid-template-columns: auto minmax(0,1fr) auto; gap: 12px; align-items: center; padding: 10px 12px; border: 1px solid var(--line); border-radius: 12px; background: var(--surface-2); }
+.habit.done { background: color-mix(in srgb, var(--good) 10%, var(--surface)); border-color: color-mix(in srgb, var(--good) 35%, var(--line)); }
+.check { width: 40px; height: 40px; border-radius: 12px; border: 2px solid var(--lane); background: var(--surface); display: grid; place-items: center; color: transparent; transition: transform .12s, background .12s, border-color .12s; }
+.check svg { width: 22px; height: 22px; }
+.check:hover { border-color: var(--good); }
+.habit.done .check { background: var(--good); border-color: var(--good); color: #fff; }
+.check.pop { animation: pop .32s ease-out; }
+@keyframes pop { 40% { transform: scale(1.18); } 100% { transform: scale(1); } }
+.habit-name { font-weight: 600; overflow-wrap: anywhere; display: flex; align-items: center; gap: 8px; }
+.habit-name .ico { font-size: 18px; line-height: 1; }
+.habit-sub { font-size: 12.5px; color: var(--muted); display: flex; gap: 10px; flex-wrap: wrap; align-items: center; }
+.streak { display: inline-flex; align-items: center; gap: 3px; color: var(--flame); font-weight: 700; font-family: var(--f-mono); font-size: 12.5px; }
+.streak svg { width: 13px; height: 13px; }
+.xp-chip { font-family: var(--f-mono); font-weight: 700; font-size: 12.5px; padding: 3px 8px; border-radius: 999px; background: var(--xp-soft); color: var(--xp); white-space: nowrap; }
+.habit.done .xp-chip { background: transparent; }
+.habit-right { display: flex; align-items: center; gap: 4px; }
+.icon-btn { border: 0; background: transparent; color: var(--muted); width: 30px; height: 30px; border-radius: 8px; display: grid; place-items: center; }
+.icon-btn:hover { background: var(--surface); color: var(--ink); }
+.icon-btn svg { width: 16px; height: 16px; }
+.sub-head { display: flex; justify-content: space-between; align-items: center; margin-top: 4px; }
+
+/* me card */
+.me-top { display: flex; align-items: center; gap: 12px; }
+.lvl { font-family: var(--f-display); font-weight: 800; font-size: 22px; }
+.lvl small { font-family: var(--f-body); font-weight: 600; font-size: 13px; color: var(--muted); margin-left: 6px; }
+.stats { display: grid; grid-template-columns: repeat(4, minmax(0,1fr)); gap: 8px; }
+.stat { background: var(--surface-2); border-radius: 10px; padding: 8px 10px; }
+.stat b { display: block; font-family: var(--f-mono); font-size: 18px; }
+.stat span { font-size: 12px; color: var(--muted); }
+.badges { display: grid; grid-template-columns: repeat(5, minmax(0,1fr)); gap: 8px; }
+.badge { display: grid; justify-items: center; gap: 4px; text-align: center; font-size: 11.5px; font-weight: 600; line-height: 1.2; }
+.medal { width: 46px; height: 50px; display: grid; place-items: center; font-size: 22px; clip-path: polygon(50% 0, 100% 25%, 100% 75%, 50% 100%, 0 75%, 0 25%); background: linear-gradient(160deg, var(--xp-bright), var(--xp)); }
+.badge.locked .medal { background: var(--lane); filter: grayscale(1); opacity: .55; }
+.badge.locked { color: var(--muted); }
+
+.week { overflow-x: auto; }
+.week table { border-collapse: separate; border-spacing: 4px; font-size: 12px; min-width: 100%; }
+.week th { font-weight: 600; color: var(--muted); text-align: center; padding: 0 2px; }
+.week th.hname { text-align: left; font-weight: 600; color: var(--ink); max-width: 150px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.week th.perfect { color: var(--xp); }
+.week td { width: 26px; height: 22px; border-radius: 6px; background: var(--lane); opacity: .55; }
+.week td.on { background: var(--good); opacity: 1; }
+.week td.na { background: transparent; border: 1px dashed var(--line); opacity: 1; }
+
+/* leaderboard lanes */
+.lanes { display: grid; gap: 4px; }
+.lane-row { display: grid; grid-template-columns: 38px minmax(0,1fr); gap: 10px; align-items: center; padding: 10px 8px; border-radius: 12px; border: 0; background: transparent; text-align: left; width: 100%; }
+.lane-row:hover { background: var(--surface-2); }
+.lane-row.me { background: var(--accent-soft); }
+.rank { font-family: var(--f-display); font-weight: 800; font-size: 26px; text-align: center; color: var(--muted); }
+.lane-row:nth-child(1) .rank { color: var(--xp); }
+.lane-body { display: grid; gap: 6px; min-width: 0; }
+.lane-top { display: flex; align-items: center; gap: 8px; min-width: 0; }
+.lane-top .who { font-weight: 700; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; min-width: 0; }
+.lv-chip { font-size: 11px; font-weight: 700; padding: 2px 7px; border-radius: 999px; background: var(--surface-2); border: 1px solid var(--line); color: var(--muted); white-space: nowrap; }
+.lane-top .xp { margin-left: auto; font-family: var(--f-mono); font-weight: 700; color: var(--xp); white-space: nowrap; }
+.track { position: relative; height: 16px; }
+.track::before { content: ""; position: absolute; left: 0; right: 0; top: 50%; border-top: 2px dashed var(--lane); }
+.track .run { position: absolute; left: 0; top: 50%; height: 4px; transform: translateY(-50%); border-radius: 4px; background: var(--accent); transition: width .6s cubic-bezier(.2,.8,.2,1); }
+.lane-row:nth-child(1) .track .run { background: linear-gradient(90deg, var(--xp), var(--xp-bright)); }
+.track .runner { position: absolute; top: 50%; width: 16px; height: 16px; border-radius: 50%; transform: translate(-50%, -50%); border: 2px solid var(--surface); box-shadow: 0 0 0 2px var(--accent); background: var(--surface); object-fit: cover; transition: left .6s cubic-bezier(.2,.8,.2,1); }
+.lane-row:nth-child(1) .track .runner { box-shadow: 0 0 0 2px var(--xp-bright); }
+.lane-foot { display: flex; gap: 12px; align-items: center; font-size: 12px; color: var(--muted); flex-wrap: wrap; }
+.pips { display: inline-flex; gap: 3px; }
+.pips i { width: 8px; height: 8px; border-radius: 50%; background: var(--lane); }
+.pips i.on { background: var(--good); }
+.winner { display: grid; grid-template-columns: auto minmax(0,1fr); gap: 14px; align-items: center; padding: 14px 16px; border-radius: 12px; background: var(--xp-soft); border: 1px solid color-mix(in srgb, var(--xp) 45%, var(--line)); }
+.winner svg { width: 34px; height: 34px; color: var(--xp); }
+.winner b { font-family: var(--f-display); font-size: 20px; overflow-wrap: anywhere; }
+
+/* feed */
+.feed { display: grid; gap: 2px; }
+.post { display: grid; grid-template-columns: 32px minmax(0,1fr); gap: 10px; padding: 10px 4px; border-top: 1px solid var(--line); }
+.post:first-child { border-top: 0; }
+.post .avatar { width: 32px; height: 32px; }
+.post-text { font-size: 14px; overflow-wrap: anywhere; }
+.post-text b { font-weight: 700; }
+.post-time { font-size: 12px; color: var(--muted); }
+.post-note { margin-top: 6px; padding: 8px 10px; background: var(--surface-2); border-radius: 10px; font-size: 14px; overflow-wrap: anywhere; white-space: pre-wrap; }
+.post-photo { margin-top: 6px; max-width: min(260px, 100%); border-radius: 10px; display: block; border: 1px solid var(--line); background: var(--surface-2); min-height: 40px; }
+.post-actions { margin-top: 4px; display: flex; gap: 6px; align-items: center; }
+.cheer { border: 1px solid var(--line); background: var(--surface); border-radius: 999px; padding: 2px 10px; font-size: 12.5px; font-weight: 600; }
+.cheer[aria-pressed="true"] { background: var(--xp-soft); border-color: color-mix(in srgb, var(--xp) 50%, var(--line)); }
+.post.perfect .post-text b.tag { color: var(--xp); }
+
+/* sheet */
+.scrim { position: fixed; inset: 0; z-index: 50; background: rgba(8,12,20,.45); display: grid; place-items: center; padding: max(16px, env(safe-area-inset-top, 0px)) max(16px, env(safe-area-inset-right, 0px)) max(16px, env(safe-area-inset-bottom, 0px)) max(16px, env(safe-area-inset-left, 0px)); }
+.sheet { width: min(560px, 100%); max-height: calc(100vh - 32px); overflow: auto; background: var(--surface); border-radius: 18px; border: 1px solid var(--line); box-shadow: 0 24px 60px -20px rgba(0,0,0,.45); padding: 20px; display: grid; gap: 16px; }
+.sheet-head { display: flex; justify-content: space-between; align-items: flex-start; gap: 12px; }
+.sheet-head h2 { font-size: 22px; font-weight: 800; overflow-wrap: anywhere; }
+.sheet-foot { display: flex; gap: 8px; justify-content: flex-end; flex-wrap: wrap; }
+.photo-preview { max-width: 100%; max-height: 220px; border-radius: 12px; border: 1px solid var(--line); }
+.rules-table { width: 100%; border-collapse: collapse; font-size: 14px; }
+.rules-table td { padding: 8px 4px; border-top: 1px solid var(--line); vertical-align: top; }
+.rules-table td:last-child { text-align: right; font-family: var(--f-mono); font-weight: 700; color: var(--xp); white-space: nowrap; }
+.copy-box { font-family: var(--f-mono); font-size: 13px; padding: 10px 12px; background: var(--surface-2); border: 1px solid var(--line); border-radius: 10px; overflow-wrap: anywhere; user-select: all; }
+
+/* toasts */
+.toasts { position: fixed; z-index: 60; left: 50%; transform: translateX(-50%); bottom: calc(16px + env(safe-area-inset-bottom, 0px)); display: grid; gap: 8px; justify-items: center; width: min(420px, calc(100% - 32px)); pointer-events: none; }
+.toast { background: var(--ink); color: var(--bg); padding: 10px 16px; border-radius: 12px; font-weight: 600; font-size: 14px; box-shadow: var(--shadow); animation: up .25s ease-out; text-align: center; }
+.toast.gold { background: linear-gradient(90deg, var(--xp), var(--xp-bright)); color: #1D1500; }
+@keyframes up { from { transform: translateY(10px); opacity: 0; } }
+
+.center-state { display: grid; justify-items: center; text-align: center; gap: 10px; padding: 60px 16px; color: var(--muted); }
+.center-state h2 { color: var(--ink); font-size: 24px; }
+.skeleton { height: 64px; border-radius: 12px; background: linear-gradient(90deg, var(--surface-2), var(--line), var(--surface-2)); background-size: 200% 100%; animation: shimmer 1.4s infinite linear; }
+@keyframes shimmer { to { background-position: -200% 0; } }
+
+@media (max-width: 860px) {
+  .lobby, .room-grid { grid-template-columns: minmax(0, 1fr); }
+}
+@media (max-width: 480px) {
+  .stats { grid-template-columns: repeat(2, minmax(0,1fr)); }
+  .badges { grid-template-columns: repeat(5, minmax(0,1fr)); gap: 4px; }
+  .medal { width: 38px; height: 42px; font-size: 18px; }
+  .badge span { font-size: 10.5px; }
+  .grid2 { grid-template-columns: 1fr; }
+  .panel { padding: 14px; }
+  .me-chip span { max-width: 90px; }
+}
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { animation: none !important; transition: none !important; }
+}
+</style>
+
+<header class="top">
+  <div class="wrap">
+    <a class="brand" href="#">
+      <svg class="brand-mark" viewBox="0 0 32 32" aria-hidden="true"><rect width="32" height="32" rx="9" fill="var(--accent)"/><path d="M6 22c4-9 16-9 20 0" fill="none" stroke="var(--accent-ink)" stroke-width="2.4" stroke-linecap="round"/><path d="M10 22c2.5-5 9.5-5 12 0" fill="none" stroke="var(--accent-ink)" stroke-width="2.4" stroke-linecap="round" opacity=".6"/><circle cx="16" cy="11" r="2.6" fill="var(--xp-bright)"/></svg>
+      <span class="brand-name">Habit Arena</span>
+    </a>
+    <div id="me-slot"></div>
+  </div>
+</header>
+<main class="wrap" id="view"></main>
+<div class="toasts" id="toasts" aria-live="polite"></div>
+
+<script>
+(() => {
+"use strict";
+
+/* ---------- constants ---------- */
+const ARTIFACT_URL = "https://claude.ai/artifact/MD1PZZPu6CS3P5RrfcNRL5";
+const BASE_XP = 10, PERFECT_XP = 25, MAX_SHARED = 8, MAX_PERSONAL = 3, MAX_TRACKED = 40;
+const ICONS = ["💧","📚","🏃","🧘","🥗","😴","✍️","💪","🚭","🌅","🧠","🎸","🚶","🧹","💊","📵","🍎","🚴"];
+const SUGGEST = [["💧","Drink 2L of water"],["📚","Read 20 pages"],["🏃","Move for 30 min"],["🧘","Meditate 10 min"],["😴","In bed by 23:00"],["📵","No phone first hour"],["🥗","No sugar"],["✍️","Journal"]];
+const LEVEL_NAMES = ["Rookie","Regular","Committed","Disciplined","Relentless","Machine","Legend","Mythic"];
+const BADGES = [
+  { id: "first", icon: "👣", name: "First step", desc: "Check in once", test: s => s.checkins >= 1 },
+  { id: "fire3", icon: "🔥", name: "On fire", desc: "3-day streak on a habit", test: s => s.bestStreak >= 3 },
+  { id: "week7", icon: "🗓️", name: "Week warrior", desc: "7-day streak on a habit", test: s => s.bestStreak >= 7 },
+  { id: "iron14", icon: "🛡️", name: "Unbreakable", desc: "14-day streak on a habit", test: s => s.bestStreak >= 14 },
+  { id: "perfect", icon: "⭐", name: "Perfect day", desc: "Every habit done in one day", test: s => s.perfectDays >= 1 },
+  { id: "perfect7", icon: "🌟", name: "Perfect week", desc: "7 perfect days in a row", test: s => s.bestPerfectRun >= 7 },
+  { id: "early", icon: "🌅", name: "Early bird", desc: "Check in before 7:00", test: s => s.early },
+  { id: "owl", icon: "🌙", name: "Night owl", desc: "Check in after 23:00", test: s => s.owl },
+  { id: "proof5", icon: "📸", name: "Receipts", desc: "Post 5 proofs", test: s => s.proofs >= 5 },
+  { id: "fifty", icon: "💯", name: "Half-century", desc: "50 check-ins", test: s => s.checkins >= 50 },
+];
+const SVG = {
+  check: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg>',
+  flame: '<svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2c1 4 5 6 5 11a5 5 0 0 1-10 0c0-2.5 1.2-4 2.5-5 .2 1.6 1 2.6 2 3C11 8 11 5 12 2z"/></svg>',
+  back: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 5l-7 7 7 7"/></svg>',
+  copy: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="8" y="8" width="12" height="12" rx="2"/><path d="M16 8V6a2 2 0 0 0-2-2H6a2 2 0 0 0-2 2v8a2 2 0 0 0 2 2h2"/></svg>',
+  gear: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.7 1.7 0 0 0 .3 1.8l.1.1a2 2 0 1 1-2.8 2.8l-.1-.1a1.7 1.7 0 0 0-1.8-.3 1.7 1.7 0 0 0-1 1.5V21a2 2 0 1 1-4 0v-.1a1.7 1.7 0 0 0-1.1-1.5 1.7 1.7 0 0 0-1.8.3l-.1.1a2 2 0 1 1-2.8-2.8l.1-.1a1.7 1.7 0 0 0 .3-1.8 1.7 1.7 0 0 0-1.5-1H3a2 2 0 1 1 0-4h.1a1.7 1.7 0 0 0 1.5-1.1 1.7 1.7 0 0 0-.3-1.8l-.1-.1a2 2 0 1 1 2.8-2.8l.1.1a1.7 1.7 0 0 0 1.8.3H9a1.7 1.7 0 0 0 1-1.5V3a2 2 0 1 1 4 0v.1a1.7 1.7 0 0 0 1 1.5 1.7 1.7 0 0 0 1.8-.3l.1-.1a2 2 0 1 1 2.8 2.8l-.1.1a1.7 1.7 0 0 0-.3 1.8V9a1.7 1.7 0 0 0 1.5 1H21a2 2 0 1 1 0 4h-.1a1.7 1.7 0 0 0-1.5 1z"/></svg>',
+  plus: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg>',
+  x: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M6 6l12 12M18 6L6 18"/></svg>',
+  crown: '<svg viewBox="0 0 24 24" fill="currentColor"><path d="M3 8l4.5 4L12 5l4.5 7L21 8l-2 11H5L3 8z"/></svg>',
+  camera: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 8h3l2-3h6l2 3h3v11H4z"/><circle cx="12" cy="13" r="3.5"/></svg>',
+};
+
+/* ---------- tiny helpers ---------- */
+const $ = (s, r = document) => r.querySelector(s);
+const put = (el, ...kids) => el.replaceChildren(...kids.flat(Infinity).filter(k => k != null && k !== false));
+function h(tag, attrs, ...kids) {
+  const el = document.createElement(tag);
+  if (attrs) for (const [k, v] of Object.entries(attrs)) {
+    if (v == null || v === false) continue;
+    if (k === "class") el.className = v;
+    else if (k === "svg") el.innerHTML = v; // constant markup only
+    else if (k === "style") el.style.cssText = v;
+    else if (k.startsWith("on")) el.addEventListener(k.slice(2), v);
+    else if (k === "value") el.value = v;
+    else if (k === "checked") el.checked = !!v;
+    else el.setAttribute(k, v === true ? "" : v);
+  }
+  for (const c of kids.flat(Infinity)) {
+    if (c == null || c === false) continue;
+    el.append(c instanceof Node ? c : document.createTextNode(String(c)));
+  }
+  return el;
+}
+const icon = (name, cls) => h("span", { class: cls || null, svg: SVG[name], "aria-hidden": "true", style: "display:inline-grid" });
+const pad = n => String(n).padStart(2, "0");
+const ymd = d => d.getFullYear() + "-" + pad(d.getMonth() + 1) + "-" + pad(d.getDate());
+const parseYmd = s => { const [y, m, d] = s.split("-").map(Number); return new Date(y, m - 1, d); };
+const addDays = (s, n) => { const d = parseYmd(s); d.setDate(d.getDate() + n); return ymd(d); };
+const daysBetween = (a, b) => Math.round((parseYmd(b) - parseYmd(a)) / 864e5);
+const todayStr = () => ymd(new Date());
+const fmtDate = s => parseYmd(s).toLocaleDateString(undefined, { month: "short", day: "numeric" });
+const fmtNum = n => n.toLocaleString();
+const rid = (n = 8) => Array.from(crypto.getRandomValues(new Uint8Array(n)), b => "abcdefghijkmnopqrstuvwxyz23456789"[b % 33]).join("");
+const newCode = () => Array.from(crypto.getRandomValues(new Uint8Array(6)), b => "ABCDEFGHJKLMNPQRSTUVWXYZ23456789"[b % 32]).join("");
+const clone = o => JSON.parse(JSON.stringify(o || {}));
+const isCode = s => /^[A-Z2-9]{6}$/.test(s);
+function ago(t) {
+  const s = (Date.now() - t) / 1000;
+  if (s < 60) return "just now";
+  if (s < 3600) return Math.floor(s / 60) + " min ago";
+  if (s < 86400) return Math.floor(s / 3600) + " h ago";
+  if (s < 172800) return "yesterday";
+  return new Date(t).toLocaleDateString(undefined, { month: "short", day: "numeric" });
+}
+function toast(msg, gold) {
+  const t = h("div", { class: "toast" + (gold ? " gold" : "") }, msg);
+  $("#toasts").append(t);
+  setTimeout(() => t.remove(), gold ? 3200 : 2600);
+}
+
+/* ---------- scoring (pure) ---------- */
+const mult = s => s >= 14 ? 2.5 : s >= 7 ? 2 : s >= 3 ? 1.5 : 1;
+function habitList(room, m) {
+  const shared = (room && room.habits) || [];
+  const personal = room && room.allowPersonal && m && m.personal ? m.personal : [];
+  return [...shared.map(x => ({ ...x, kind: "shared" })), ...personal.map(x => ({ ...x, kind: "personal" }))];
+}
+function score(room, m, asOf) {
+  const r = { xp: 0, checkins: 0, perfectDays: 0, bestPerfectRun: 0, bestStreak: 0, proofs: 0, early: false, owl: false, streak: {}, todayDone: 0, todayTotal: 0, days: {} };
+  if (!room || !room.start) return r;
+  const habits = habitList(room, m), log = (m && m.log) || {};
+  const last = room.end < asOf ? room.end : asOf;
+  let run = 0;
+  for (let d = room.start; d <= last; d = addDays(d, 1)) {
+    const day = log[d] || {};
+    let dx = 0, active = 0, done = 0;
+    for (const hb of habits) {
+      if (hb.since && d < hb.since) continue;
+      active++;
+      const e = day[hb.id];
+      if (e) {
+        const s = (r.streak[hb.id] || 0) + 1;
+        r.streak[hb.id] = s;
+        if (s > r.bestStreak) r.bestStreak = s;
+        done++; r.checkins++;
+        dx += Math.round(BASE_XP * mult(s));
+        if (e.note || e.photo) r.proofs++;
+        if (e.t) { const hr = new Date(e.t).getHours(); if (hr < 7) r.early = true; if (hr >= 23) r.owl = true; }
+      } else if (d < asOf) r.streak[hb.id] = 0;
+    }
+    const perfect = active > 0 && done === active;
+    if (perfect) { dx += PERFECT_XP; r.perfectDays++; run++; if (run > r.bestPerfectRun) r.bestPerfectRun = run; }
+    else if (d < asOf) run = 0;
+    r.days[d] = { xp: dx, done, active, perfect };
+    r.xp += dx;
+    if (d === asOf) { r.todayDone = done; r.todayTotal = active; }
+  }
+  return r;
+}
+function levelOf(xp) {
+  let L = 1;
+  while (xp >= 50 * L * (L + 1)) L++;
+  const floor = 50 * (L - 1) * L, next = 50 * L * (L + 1);
+  const name = LEVEL_NAMES[Math.min(L, LEVEL_NAMES.length) - 1] + (L > LEVEL_NAMES.length ? " " + (L - LEVEL_NAMES.length + 1) : "");
+  return { L, name, into: xp - floor, span: next - floor, next };
+}
+function phase(room, t) {
+  if (!room) return "none";
+  if (t < room.start) return "upcoming";
+  if (t > room.end) return "ended";
+  return "active";
+}
+
+/* ---------- state ---------- */
+const S = {
+  status: "loading", db: null, user: null, assets: null, me: null, meInfo: null, canWrite: null, isOwner: false,
+  myProfile: {}, myRooms: new Map(), myRoomsLoaded: false, roomCache: new Map(), profiles: {}, room: null,
+  day: "today", loadTimedOut: false, feedLimit: 12,
+};
+const readOnly = () => S.canWrite === false;
+const myNick = () => (S.myProfile && S.myProfile.nick) || (S.meInfo && S.meInfo.name) || "";
+
+function nameOf(uid) {
+  if (uid === S.me) return myNick() || "You";
+  const R = S.room, nick = R && R.nicks.get(uid);
+  return nick || (S.profiles[uid] && S.profiles[uid].name) || "Player";
+}
+function avatarOf(uid, cls) {
+  const p = S.profiles[uid] || (uid === S.me && S.meInfo);
+  if (p && p.avatarUrl) return h("img", { class: "avatar " + (cls || ""), src: p.avatarUrl, alt: "" });
+  return h("span", { class: "avatar " + (cls || ""), style: "display:grid;place-items:center;font-weight:700;font-size:12px;color:var(--muted)" }, (nameOf(uid)[0] || "?").toUpperCase());
+}
+let profTimer = null;
+function wantProfiles(ids) {
+  if (!S.user || !ids.length) return;
+  const missing = ids.filter(id => !S.profiles[id]);
+  clearTimeout(profTimer);
+  profTimer = setTimeout(async () => {
+    try {
+      const ps = await S.user.profiles(ids);
+      let changed = missing.length > 0;
+      for (const id of ids) { if (!S.profiles[id] || S.profiles[id].name !== ps[id].name) changed = true; S.profiles[id] = ps[id]; }
+      if (changed) refresh();
+    } catch (_) {}
+  }, 30);
+}
+
+/* ---------- rendering ---------- */
+let raf = 0;
+function refresh() { if (!raf) raf = requestAnimationFrame(() => { raf = 0; update(); }); }
+function route() {
+  const hsh = decodeURIComponent(location.hash.slice(1)).trim().toUpperCase();
+  if (hsh === "NEW") return { view: "create" };
+  if (isCode(hsh)) return { view: "room", code: hsh };
+  return { view: "lobby" };
+}
+let current = null;
+function renderRoute() {
+  closeSheet();
+  const r = route();
+  const view = $("#view");
+  view.replaceChildren();
+  if (r.view !== "room" && S.room) leaveRoomSubs();
+  current = r;
+  renderMeChip();
+  if (S.status === "loading") { view.append(h("div", { class: "center-state" }, h("div", { class: "skeleton", style: "width:min(420px,100%)" }), h("div", { class: "skeleton", style: "width:min(420px,100%)" }), "Opening the arena…")); return; }
+  if (S.status === "nodb") { view.append(stateBox("This page can't reach its saved data here", "Open it on claude.ai while signed in to create rooms and check in.")); return; }
+  if (S.status === "noid") { view.append(stateBox("Sign in to play", "Habit Arena keeps your rooms and check-ins under your claude.ai account. Sign in, then reopen this page.")); return; }
+  if (r.view === "lobby") renderLobby(view);
+  else if (r.view === "create") renderCreate(view);
+  else renderRoom(view, r.code);
+  update();
+}
+function update() {
+  renderMeChip();
+  if (!current) return;
+  if (current.view === "lobby") updateLobby();
+  else if (current.view === "room") updateRoom();
+}
+function stateBox(title, text, ...extra) { return h("div", { class: "center-state" }, h("h2", null, title), h("p", { style: "max-width:46ch;margin:0" }, text), ...extra); }
+
+function renderMeChip() {
+  const slot = $("#me-slot");
+  if (!S.me) { slot.replaceChildren(); return; }
+  slot.replaceChildren(h("button", { class: "me-chip", onclick: openNickSheet, "aria-label": "Change your player name" }, avatarOf(S.me), h("span", null, myNick() || "Set your name")));
+}
+
+/* ----- lobby ----- */
+function renderLobby(view) {
+  const codeIn = h("input", { type: "text", id: "join-code", maxlength: "6", placeholder: "K7QF2X", "aria-label": "Room code", autocomplete: "off" });
+  const join = e => {
+    e.preventDefault();
+    const c = codeIn.value.trim().toUpperCase().replace(/[^A-Z0-9]/g, "");
+    if (!isCode(c)) { toast("Room codes are 6 letters and digits"); return; }
+    location.hash = c;
+  };
+  view.append(
+    h("section", { class: "hero" },
+      h("h1", null, "Build habits. Beat your friends."),
+      h("p", null, "Open a room, invite friends with a code, and earn XP for every habit you keep. Streaks multiply it, perfect days top it up, and the leaderboard settles the argument.")),
+    h("div", { class: "lobby" },
+      h("section", { class: "card panel" },
+        h("div", { class: "panel-head" }, h("h2", { style: "font-size:20px" }, "Your rooms"),
+          h("a", { class: "btn primary" + (readOnly() ? " disabled" : ""), href: "#new", "aria-disabled": readOnly() ? "true" : null, onclick: e => { if (readOnly()) { e.preventDefault(); toast("You need edit access to this page to create rooms"); } } }, icon("plus"), "New room")),
+        h("div", { id: "lobby-rooms", class: "rooms" })),
+      h("aside", { class: "side" },
+        h("form", { class: "card panel", onsubmit: join },
+          h("h2", { style: "font-size:18px" }, "Join with a code"),
+          h("div", { class: "join-row" }, codeIn, h("button", { class: "btn primary", type: "submit" }, "Join")),
+          h("p", { class: "muted", style: "margin:0;font-size:13px" }, "Ask the room creator for the code, or open their invite link.")),
+        h("div", { class: "card panel" },
+          h("h2", { style: "font-size:18px" }, "How it works"),
+          h("ol", { class: "steps" },
+            h("li", null, h("span", { class: "n" }, "1"), h("span", null, h("b", null, "Create a room"), " with shared habits and a start and end date.")),
+            h("li", null, h("span", { class: "n" }, "2"), h("span", null, h("b", null, "Send the code"), " to friends. Everyone can add up to 3 personal habits.")),
+            h("li", null, h("span", { class: "n" }, "3"), h("span", null, h("b", null, "Check in daily."), " Streaks multiply XP; a perfect day adds a bonus."))),
+          h("button", { class: "linkish", type: "button", onclick: openRulesSheet }, "See the XP rules")))));
+  if (readOnly()) view.prepend(h("div", { class: "notice warn", style: "margin-bottom:16px" }, "You can look around, but you can't save check-ins. Ask the owner of this page to share it with you as an Editor."));
+}
+function updateLobby() {
+  const box = $("#lobby-rooms");
+  if (!box) return;
+  const t = todayStr();
+  if (!S.myRoomsLoaded) { put(box, h("div", { class: "skeleton" }), h("div", { class: "skeleton" }), S.loadTimedOut ? h("p", { class: "muted" }, "Can't reach your saved rooms yet. Check your connection.") : null); return; }
+  if (!S.myRooms.size) {
+    box.replaceChildren(h("div", { class: "notice" }, "No rooms yet. Create one and send the code to your friends, or join with a code someone sent you."));
+    return;
+  }
+  const items = [...S.myRooms.entries()].map(([code, m]) => ({ code, m, room: S.roomCache.get(code) }));
+  items.sort((a, b) => (b.m.joinedAt || 0) - (a.m.joinedAt || 0));
+  box.replaceChildren(...items.map(({ code, m, room }) => {
+    if (room === undefined) return h("div", { class: "skeleton" });
+    if (room === null) return h("div", { class: "card room-card" },
+      h("div", { class: "room-badge", style: "background:var(--lane)" }, "?"),
+      h("div", null, h("h3", null, "Room ", h("span", { class: "code-chip" }, code)), h("div", { class: "room-meta" }, "This room was deleted by its creator.")),
+      h("button", { class: "btn sm", onclick: () => removeMyRoomDoc(code) }, "Remove"));
+    const ph = phase(room, t), sc = score(room, m, t), lv = levelOf(sc.xp);
+    const total = daysBetween(room.start, room.end) + 1;
+    const status = ph === "upcoming" ? "Starts " + fmtDate(room.start) : ph === "ended" ? "Finished " + fmtDate(room.end) : "Day " + (daysBetween(room.start, t) + 1) + " of " + total;
+    const habitsN = habitList(room, m).length;
+    return h("a", { class: "card room-card", href: "#" + code },
+      h("div", { class: "room-badge" }, (room.name || "?").trim()[0].toUpperCase()),
+      h("div", { style: "min-width:0" }, h("h3", null, room.name),
+        h("div", { class: "room-meta" }, h("span", null, status),
+          ph === "active" ? h("span", null, sc.todayDone + "/" + sc.todayTotal + " today") : h("span", null, habitsN + " habit" + (habitsN === 1 ? "" : "s")))),
+      h("div", { class: "room-xp" }, h("b", null, fmtNum(sc.xp) + " XP"), h("small", null, "Lv " + lv.L + " · " + lv.name)));
+  }));
+}
+
+/* ----- create room ----- */
+function habitEditor(list, max, onChange) {
+  const box = h("div", { class: "form-section" });
+  function draw() {
+    box.replaceChildren(
+      ...list.map((hb, i) => {
+        const sel = h("select", { "aria-label": "Icon", onchange: e => { hb.icon = e.target.value; } }, ...ICONS.map(ic => h("option", { value: ic }, ic)));
+        sel.value = hb.icon || ICONS[0];
+        return h("div", { class: "habit-edit" }, sel,
+          h("input", { type: "text", id: "habit-" + hb.id, value: hb.name, maxlength: "48", placeholder: "e.g. Read 20 pages", "aria-label": "Habit name", oninput: e => { hb.name = e.target.value; } }),
+          h("button", { type: "button", class: "icon-btn", svg: SVG.x, "aria-label": "Remove habit", onclick: () => { list.splice(i, 1); draw(); onChange && onChange(); } }));
+      }),
+      list.length < max ? h("div", { class: "chips" },
+        h("button", { type: "button", class: "chip", onclick: () => { list.push({ id: "h" + rid(6), icon: ICONS[list.length % ICONS.length], name: "" }); draw(); const last = list[list.length - 1]; setTimeout(() => { const el = document.getElementById("habit-" + last.id); el && el.focus(); }); } }, "+ Add habit"),
+        ...SUGGEST.filter(([, n]) => !list.some(x => x.name.trim().toLowerCase() === n.toLowerCase())).slice(0, 5).map(([ic, n]) =>
+          h("button", { type: "button", class: "chip suggest", onclick: () => { list.push({ id: "h" + rid(6), icon: ic, name: n }); draw(); } }, ic + " " + n))) : h("p", { class: "muted", style: "margin:0;font-size:13px" }, "That's the maximum of " + max + " habits."));
+  }
+  draw();
+  return box;
+}
+function toggleRow(id, title, sub, checked, onchange) {
+  return h("label", { class: "toggle", for: id }, h("span", null, h("b", null, title), h("small", null, sub)),
+    h("span", { class: "switch" }, h("input", { type: "checkbox", id, checked, onchange: e => onchange(e.target.checked) }), h("i")));
+}
+function renderCreate(view) {
+  if (readOnly()) { view.append(stateBox("You can't create rooms here", "Ask the owner of this page to share it with you as an Editor.", h("a", { class: "btn", href: "#" }, "Back to rooms"))); return; }
+  const t = todayStr();
+  const f = { name: "", start: t, len: 30, end: addDays(t, 29), allowPersonal: true, proof: false, habits: [{ id: "h" + rid(6), icon: "💧", name: "Drink 2L of water" }, { id: "h" + rid(6), icon: "📚", name: "Read 20 pages" }] };
+  const nick = h("input", { type: "text", id: "create-nick", maxlength: "24", value: myNick(), placeholder: "How friends see you" });
+  const endOut = h("span", { class: "muted", style: "font-size:13px" });
+  const endIn = h("input", { type: "date", id: "create-end", value: f.end, hidden: true, onchange: e => { f.end = e.target.value; showEnd(); } });
+  const lens = [7, 14, 21, 30, 0];
+  const lenChips = h("div", { class: "chips" });
+  function showEnd() {
+    if (f.len) f.end = addDays(f.start, f.len - 1);
+    endIn.hidden = !!f.len;
+    endIn.min = f.start;
+    endIn.value = f.end;
+    const n = daysBetween(f.start, f.end) + 1;
+    endOut.textContent = n > 0 ? "Runs " + fmtDate(f.start) + " to " + fmtDate(f.end) + " · " + n + " days" : "The end date must be after the start date";
+    lenChips.replaceChildren(...lens.map(L => h("button", { type: "button", class: "chip", "aria-pressed": String(f.len === L), onclick: () => { f.len = L; showEnd(); } }, L ? L + " days" : "Custom")));
+  }
+  const startIn = h("input", { type: "date", id: "create-start", value: f.start, min: t, onchange: e => { f.start = e.target.value || t; showEnd(); } });
+  showEnd();
+  const submit = h("button", { class: "btn primary", type: "submit" }, "Create room");
+  view.append(
+    h("div", { class: "crumbs" }, h("a", { href: "#" }, icon("back"), "Rooms")),
+    h("h1", { style: "font-size:clamp(26px,4vw,36px);font-weight:800;margin-bottom:18px" }, "New room"),
+    h("form", { class: "form card panel", onsubmit: async e => {
+      e.preventDefault();
+      const name = $("#create-name").value.trim();
+      const habits = f.habits.map(x => ({ ...x, name: x.name.trim() })).filter(x => x.name);
+      if (!name) { toast("Give the room a name"); $("#create-name").focus(); return; }
+      if (!habits.length) { toast("Add at least one habit"); return; }
+      if (f.end < f.start) { toast("The end date must be after the start date"); return; }
+      submit.disabled = true; submit.textContent = "Creating…";
+      try {
+        await saveNick(nick.value);
+        const code = await createRoom({ name: name.slice(0, 40), start: f.start, end: f.end, allowPersonal: f.allowPersonal, proof: f.proof, habits: habits.map(x => ({ id: x.id, icon: x.icon, name: x.name, since: f.start })) });
+        location.hash = code;
+        toast("Room created. Share the code " + code);
+      } catch (err) { writeFailed(err); submit.disabled = false; submit.textContent = "Create room"; }
+    } },
+      h("label", { class: "field" }, h("span", null, "Room name"), h("input", { type: "text", id: "create-name", maxlength: "40", placeholder: "e.g. December reset", required: true })),
+      h("div", { class: "form-section" }, h("span", { class: "label" }, "Challenge length"),
+        h("div", { class: "grid2" }, h("label", { class: "field" }, h("span", null, "Starts"), startIn), h("label", { class: "field" }, h("span", null, "Ends"), endIn, endOut)),
+        lenChips),
+      h("div", { class: "form-section" }, h("span", { class: "label" }, "Shared habits (everyone competes on these)"), habitEditor(f.habits, MAX_SHARED)),
+      toggleRow("create-personal", "Personal habits", "Each member can add up to " + MAX_PERSONAL + " of their own. They earn XP too.", f.allowPersonal, v => f.allowPersonal = v),
+      toggleRow("create-proof", "Require proof", "Check-ins need a note or a photo. You can change this later.", f.proof, v => f.proof = v),
+      h("label", { class: "field" }, h("span", null, "Your player name"), nick),
+      h("div", { class: "row", style: "justify-content:flex-end" }, h("a", { class: "btn ghost", href: "#" }, "Cancel"), submit)));
+  setTimeout(() => $("#create-name") && $("#create-name").focus());
+}
+
+/* ----- room ----- */
+function renderRoom(view, code) {
+  if (!S.room || S.room.code !== code) enterRoom(code);
+  view.append(h("div", { id: "room-root" }));
+}
+function updateRoom() {
+  const root = $("#room-root");
+  const R = S.room;
+  if (!root || !R) return;
+  const t = todayStr();
+  if (R.data === undefined) {
+    root.replaceChildren(R.timedOut ? stateBox("Can't reach this room yet", "Check your connection. The room will appear as soon as it loads.") : h("div", { class: "center-state" }, h("div", { class: "skeleton", style: "width:min(520px,100%)" }), "Loading room " + R.code + "…"));
+    return;
+  }
+  if (R.data === null) {
+    put(root, stateBox("No room with code " + R.code, "Check the code with whoever sent it. Codes are 6 characters, like K7QF2X.", h("a", { class: "btn", href: "#" }, "Back to rooms"), S.myRooms.has(R.code) ? h("button", { class: "btn danger", onclick: () => removeMyRoomDoc(R.code).then(() => location.hash = "") }, "Remove it from my rooms") : null));
+    return;
+  }
+  const room = R.data, ph = phase(room, t);
+  const member = S.myRooms.has(R.code);
+  const uids = R.members.map(m => m.uid);
+  if (member && !uids.includes(S.me)) uids.push(S.me);
+  wantProfiles(uids);
+  const rows = uids.map(uid => {
+    const m = uid === S.me && R.mine ? R.mine : R.logs.get(uid);
+    return { uid, m, sc: score(room, m, t) };
+  }).sort((a, b) => b.sc.xp - a.sc.xp || b.sc.checkins - a.sc.checkins || nameOf(a.uid).localeCompare(nameOf(b.uid)));
+
+  const total = daysBetween(room.start, room.end) + 1;
+  const dayN = Math.min(total, Math.max(0, daysBetween(room.start, t) + 1));
+  const isCreator = room.createdBy === S.me;
+  const head = h("section", { class: "room-head" },
+    h("div", null,
+      h("div", { class: "crumbs" }, h("a", { href: "#" }, icon("back"), "Rooms")),
+      h("div", { class: "room-title" },
+        h("h1", null, room.name),
+        h("div", { class: "head-actions" },
+          h("button", { class: "btn", onclick: () => copyInvite(R.code, room.name), title: "Copy invite" }, icon("copy"), h("span", { class: "code-chip" }, R.code)),
+          member || isCreator ? h("button", { class: "btn", onclick: () => isCreator ? openSettingsSheet() : openRoomInfoSheet(), "aria-label": isCreator ? "Room settings" : "Room info" }, icon("gear"), isCreator ? "Settings" : "Room") : null))),
+    h("div", { class: "season" },
+      h("div", { class: "season-line" },
+        h("b", null, ph === "upcoming" ? "Starts in " + daysBetween(t, room.start) + " day" + (daysBetween(t, room.start) === 1 ? "" : "s") : ph === "ended" ? "Challenge finished" : "Day " + dayN + " of " + total),
+        h("span", { class: "muted" }, fmtDate(room.start) + " – " + fmtDate(room.end) + " · " + uids.length + " player" + (uids.length === 1 ? "" : "s") + (room.proof ? " · proof required" : ""))),
+      total <= 62
+        ? h("div", { class: "ticks", "aria-hidden": "true" }, ...Array.from({ length: total }, (_, i) => h("i", { class: i < dayN - 1 || ph === "ended" ? "past" : i === dayN - 1 && ph === "active" ? "now" : "" })))
+        : h("div", { class: "bar" }, h("i", { style: "width:" + (ph === "ended" ? 100 : (dayN / total) * 100) + "%" }))));
+
+  const left = h("div", { class: "col" });
+  const right = h("div", { class: "col" });
+  if (member) left.append(todayPanel(room, ph, t), meCard(room, rows.find(r => r.uid === S.me), t));
+  else left.append(joinPanel(room, ph));
+  right.append(boardPanel(room, rows, ph, t), feedPanel(room, uids, t));
+  const extra = R.members.length > MAX_TRACKED ? h("p", { class: "muted" }, "Showing the first " + MAX_TRACKED + " players.") : null;
+  put(root, head, readOnly() ? h("div", { class: "notice warn", style: "margin-bottom:16px" }, "You're watching. To check in, ask the owner of this page to share it with you as an Editor.") : null, h("div", { class: "room-grid" }, left, right), extra);
+}
+
+function allowedDays(room, t) {
+  const y = addDays(t, -1);
+  return { today: t >= room.start && t <= room.end ? t : null, yesterday: y >= room.start && y <= room.end ? y : null };
+}
+function todayPanel(room, ph, t) {
+  const R = S.room, m = R.mine || {};
+  const days = allowedDays(room, t);
+  if (!days[S.day]) S.day = days.today ? "today" : "yesterday";
+  const date = days[S.day];
+  const panel = h("section", { class: "card panel" });
+  const headRight = days.today && days.yesterday ? h("div", { class: "seg", role: "group", "aria-label": "Day" },
+    h("button", { "aria-pressed": String(S.day === "today"), onclick: () => { S.day = "today"; refresh(); } }, "Today"),
+    h("button", { "aria-pressed": String(S.day === "yesterday"), onclick: () => { S.day = "yesterday"; refresh(); } }, "Yesterday")) : null;
+  panel.append(h("div", { class: "panel-head" }, h("h2", { style: "font-size:20px" }, date ? (S.day === "today" ? "Today" : "Yesterday") : "Check-ins"), headRight));
+  if (!date) {
+    panel.append(h("div", { class: "notice" }, ph === "upcoming" ? "Check-ins open on " + fmtDate(room.start) + ". Get your personal habits ready." : "This challenge is over. Final scores are locked in."));
+  }
+  const habits = habitList(room, m);
+  const base = score(room, m, t);
+  const shared = habits.filter(x => x.kind === "shared"), personal = habits.filter(x => x.kind === "personal");
+  const row = hb => {
+    const e = date && (m.log && m.log[date] || {})[hb.id];
+    const notYet = date && hb.since && date < hb.since;
+    let gain = 0;
+    if (date && !notYet) {
+      const alt = clone(m); alt.log = alt.log || {}; alt.log[date] = { ...(alt.log[date] || {}) };
+      if (e) delete alt.log[date][hb.id]; else alt.log[date][hb.id] = { t: Date.now() };
+      gain = Math.abs(score(room, alt, t).xp - base.xp);
+    }
+    const st = base.streak[hb.id] || 0;
+    const btn = h("button", { class: "check", svg: SVG.check, "aria-label": (e ? "Undo " : "Check in ") + hb.name, "aria-pressed": String(!!e), disabled: !date || notYet || readOnly() ? true : null, onclick: () => toggleHabit(hb, date, btn) });
+    return h("div", { class: "habit" + (e ? " done" : "") }, btn,
+      h("div", { style: "min-width:0" },
+        h("div", { class: "habit-name" }, h("span", { class: "ico", "aria-hidden": "true" }, hb.icon || "•"), h("span", null, hb.name)),
+        h("div", { class: "habit-sub" },
+          st > 0 ? h("span", { class: "streak", title: st + "-day streak" }, icon("flame"), st + "d") : h("span", null, "No streak yet"),
+          mult(st + (e ? 0 : 1)) > 1 ? h("span", null, "×" + mult(st + (e ? 0 : 1)) + " XP") : null,
+          e && e.note ? h("span", null, "Note added") : null, e && e.photo ? h("span", null, "Photo added") : null)),
+      h("div", { class: "habit-right" },
+        date && !notYet ? h("span", { class: "xp-chip" }, (e ? "" : "+") + gain + " XP") : null,
+        hb.kind === "personal" && !readOnly() ? h("button", { class: "icon-btn", svg: SVG.x, "aria-label": "Remove " + hb.name, onclick: () => confirmRemovePersonal(hb) }) : null));
+  };
+  panel.append(h("div", { class: "habits" }, shared.map(row)));
+  if (room.allowPersonal) {
+    panel.append(h("div", { class: "sub-head" }, h("span", { class: "eyebrow" }, "Your habits"),
+      personal.length < MAX_PERSONAL && !readOnly() && ph !== "ended" ? h("button", { class: "btn sm", onclick: openAddPersonalSheet }, icon("plus"), "Add") : null));
+    panel.append(personal.length ? h("div", { class: "habits" }, personal.map(row)) : h("p", { class: "muted", style: "margin:0;font-size:14px" }, "Add up to " + MAX_PERSONAL + " habits only you track. They count toward your XP and perfect days."));
+  }
+  if (date) {
+    const d = base.days[date] || { done: 0, active: habits.length };
+    panel.append(h("p", { class: "muted", style: "margin:0;font-size:13px" },
+      d.active && d.done === d.active ? "Perfect day. +" + PERFECT_XP + " XP bonus earned." : (d.active - d.done) + " to go for a perfect day (+" + PERFECT_XP + " XP)."));
+  }
+  return panel;
+}
+function meCard(room, row, t) {
+  const sc = row ? row.sc : score(room, {}, t);
+  const lv = levelOf(sc.xp);
+  const panel = h("section", { class: "card panel" });
+  panel.append(
+    h("div", { class: "me-top" }, avatarOf(S.me, "lg"),
+      h("div", { style: "flex:1;min-width:0" }, h("div", { class: "lvl" }, "Lv " + lv.L, h("small", null, lv.name)),
+        h("div", { class: "bar gold", style: "margin-top:6px", role: "progressbar", "aria-valuemin": "0", "aria-valuemax": String(lv.span), "aria-valuenow": String(lv.into) }, h("i", { style: "width:" + (lv.into / lv.span * 100) + "%" })),
+        h("div", { class: "muted mono", style: "font-size:12px;margin-top:4px" }, fmtNum(lv.into) + " / " + fmtNum(lv.span) + " XP to Lv " + (lv.L + 1)))),
+    h("div", { class: "stats" },
+      h("div", { class: "stat" }, h("b", { style: "color:var(--xp)" }, fmtNum(sc.xp)), h("span", null, "XP")),
+      h("div", { class: "stat" }, h("b", null, sc.checkins), h("span", null, "Check-ins")),
+      h("div", { class: "stat" }, h("b", null, sc.perfectDays), h("span", null, "Perfect days")),
+      h("div", { class: "stat" }, h("b", { style: "color:var(--flame)" }, sc.bestStreak), h("span", null, "Best streak"))),
+    weekGrid(room, row && row.m, t),
+    h("div", { class: "panel-head" }, h("span", { class: "eyebrow" }, "Badges · " + BADGES.filter(b => b.test(sc)).length + "/" + BADGES.length), h("button", { class: "linkish", style: "font-size:13px", onclick: openRulesSheet }, "XP rules")),
+    badgeGrid(sc));
+  return panel;
+}
+function badgeGrid(sc) {
+  return h("div", { class: "badges" }, BADGES.map(b => {
+    const got = b.test(sc);
+    return h("div", { class: "badge" + (got ? "" : " locked"), title: b.name + ": " + b.desc + (got ? " (earned)" : " (locked)") }, h("div", { class: "medal", "aria-hidden": "true" }, b.icon), h("span", null, b.name));
+  }));
+}
+function weekGrid(room, m, t) {
+  const last = room.end < t ? room.end : t;
+  if (last < room.start) return null;
+  const days = [];
+  for (let i = 6; i >= 0; i--) { const d = addDays(last, -i); if (d >= room.start) days.push(d); }
+  const sc = score(room, m, t);
+  const habits = habitList(room, m);
+  const log = (m && m.log) || {};
+  return h("div", { class: "week" }, h("table", null,
+    h("thead", null, h("tr", null, h("th", { class: "hname" }, h("span", { class: "eyebrow" }, "Last 7 days")),
+      ...days.map(d => h("th", { class: sc.days[d] && sc.days[d].perfect ? "perfect" : null, title: sc.days[d] && sc.days[d].perfect ? "Perfect day" : null }, parseYmd(d).toLocaleDateString(undefined, { weekday: "narrow" }))))),
+    h("tbody", null, ...habits.map(hb => h("tr", null, h("th", { class: "hname", title: hb.name }, (hb.icon || "") + " " + hb.name),
+      ...days.map(d => h("td", { class: hb.since && d < hb.since ? "na" : (log[d] || {})[hb.id] ? "on" : null, title: fmtDate(d) })))))));
+}
+function joinPanel(room, ph) {
+  return h("section", { class: "card panel" },
+    h("h2", { style: "font-size:20px" }, "Join this room"),
+    h("p", { class: "muted", style: "margin:0" }, ph === "ended" ? "This challenge has finished, so you can only watch." : "You're watching. Join to check in on " + (room.habits || []).length + " shared habit" + ((room.habits || []).length === 1 ? "" : "s") + " and climb the leaderboard."),
+    h("div", { class: "habits" }, (room.habits || []).map(hb => h("div", { class: "habit" }, h("span", { style: "font-size:20px", "aria-hidden": "true" }, hb.icon), h("div", { class: "habit-name" }, hb.name), h("span")))),
+    ph !== "ended" && !readOnly() ? h("button", { class: "btn primary", onclick: openJoinSheet }, "Join room") : null);
+}
+function boardPanel(room, rows, ph, t) {
+  const panel = h("section", { class: "card panel" });
+  panel.append(h("div", { class: "panel-head" }, h("h2", { style: "font-size:20px" }, ph === "ended" ? "Final standings" : "Leaderboard"), h("span", { class: "eyebrow" }, ph === "active" ? "Live" : "")));
+  if (ph === "ended" && rows.length && rows[0].sc.xp > 0) {
+    panel.append(h("div", { class: "winner" }, h("span", { svg: SVG.crown, "aria-hidden": "true" }), h("div", null, h("div", { class: "eyebrow" }, "Winner"), h("b", null, nameOf(rows[0].uid)), h("div", { class: "muted mono", style: "font-size:13px" }, fmtNum(rows[0].sc.xp) + " XP · " + rows[0].sc.perfectDays + " perfect days"))));
+  }
+  if (!rows.length) { panel.append(h("div", { class: "notice" }, "No players yet. Send the code " + S.room.code + " to your friends.")); return panel; }
+  const top = Math.max(1, rows[0].sc.xp);
+  panel.append(h("div", { class: "lanes" }, rows.map((r, i) => {
+    const lv = levelOf(r.sc.xp), pct = Math.max(2, r.sc.xp / top * 100);
+    const runner = avatarOf(r.uid); runner.className = "runner"; runner.style.left = pct + "%";
+    const m = r.m || {};
+    const todays = habitList(room, m).filter(hb => !hb.since || t >= hb.since);
+    const dayLog = (m.log && m.log[t]) || {};
+    const st = Math.max(0, ...Object.values(r.sc.streak));
+    return h("button", { class: "lane-row" + (r.uid === S.me ? " me" : ""), onclick: () => openPlayerSheet(r.uid) },
+      h("div", { class: "rank" }, i + 1),
+      h("div", { class: "lane-body" },
+        h("div", { class: "lane-top" }, h("span", { class: "who" }, nameOf(r.uid)), r.uid === S.me ? h("span", { class: "lv-chip" }, "you") : null, h("span", { class: "lv-chip" }, "Lv " + lv.L), h("span", { class: "xp" }, fmtNum(r.sc.xp) + " XP")),
+        h("div", { class: "track" }, h("div", { class: "run", style: "width:" + pct + "%" }), runner),
+        h("div", { class: "lane-foot" },
+          ph === "active" ? h("span", { class: "pips", title: todays.filter(hb => dayLog[hb.id]).length + " of " + todays.length + " done today" }, todays.map(hb => h("i", { class: dayLog[hb.id] ? "on" : null }))) : null,
+          ph === "active" ? h("span", null, todays.filter(hb => dayLog[hb.id]).length + "/" + todays.length + " today") : null,
+          st > 0 ? h("span", { class: "streak" }, icon("flame"), st + "d streak") : null,
+          h("span", null, r.sc.perfectDays + " perfect"))));
+  })));
+  return panel;
+}
+function feedEvents(room, uids, t) {
+  const R = S.room, ev = [];
+  const cheers = new Map();
+  for (const uid of uids) {
+    const m = uid === S.me && R.mine ? R.mine : R.logs.get(uid);
+    if (!m) continue;
+    for (const k of Object.keys(m.cheers || {})) { if (!cheers.has(k)) cheers.set(k, new Set()); cheers.get(k).add(uid); }
+    const names = new Map(habitList(room, m).map(x => [x.id, x]));
+    const sc = score(room, m, t);
+    for (const [d, day] of Object.entries(m.log || {})) {
+      if (d < room.start || d > room.end || d > t) continue;
+      let maxT = 0;
+      for (const [hid, e] of Object.entries(day)) {
+        const hb = names.get(hid);
+        if (!hb || !e) continue;
+        maxT = Math.max(maxT, e.t || 0);
+        ev.push({ type: "check", uid, d, hid, hb, e, t: e.t || parseYmd(d).getTime(), key: uid + "~" + d + "~" + hid });
+      }
+      if (sc.days[d] && sc.days[d].perfect) ev.push({ type: "perfect", uid, d, t: maxT + 1, key: uid + "~" + d + "~perfect" });
+    }
+  }
+  ev.sort((a, b) => b.t - a.t);
+  return { ev, cheers };
+}
+function feedPanel(room, uids, t) {
+  const panel = h("section", { class: "card panel" });
+  panel.append(h("div", { class: "panel-head" }, h("h2", { style: "font-size:20px" }, "Activity")));
+  const { ev, cheers } = feedEvents(room, uids, t);
+  if (!ev.length) { panel.append(h("div", { class: "notice" }, "Check-ins show up here as they happen. Notes and photos too, when people post them.")); return panel; }
+  const member = S.myRooms.has(S.room.code);
+  const shown = ev.slice(0, S.feedLimit);
+  panel.append(h("div", { class: "feed" }, shown.map(x => {
+    const who = h("b", null, x.uid === S.me ? "You" : nameOf(x.uid));
+    const dayTxt = x.d === t ? "" : x.d === addDays(t, -1) ? " for yesterday" : " for " + fmtDate(x.d);
+    const set = cheers.get(x.key) || new Set();
+    const mine = set.has(S.me);
+    const canCheer = member && x.uid !== S.me && !readOnly();
+    let photo = null;
+    if (x.type === "check" && x.e.photo && /^[A-Za-z0-9_-]{8,64}$/.test(x.e.photo)) {
+      photo = h("img", { class: "post-photo", src: "/_blob/" + x.e.photo, alt: "Proof photo from " + nameOf(x.uid), loading: "lazy" });
+      photo.addEventListener("error", () => photo.replaceWith(h("div", { class: "post-note muted" }, "Photo not available")), { once: true });
+    }
+    return h("div", { class: "post" + (x.type === "perfect" ? " perfect" : "") }, avatarOf(x.uid),
+      h("div", { style: "min-width:0" },
+        x.type === "perfect"
+          ? h("div", { class: "post-text" }, who, " had a ", h("b", { class: "tag" }, "perfect day"), dayTxt, ". +" + PERFECT_XP + " XP")
+          : h("div", { class: "post-text" }, who, " checked in ", h("b", null, (x.hb.icon ? x.hb.icon + " " : "") + x.hb.name), dayTxt),
+        h("div", { class: "post-time" }, ago(x.t)),
+        x.type === "check" && x.e.note ? h("div", { class: "post-note" }, x.e.note) : null,
+        photo,
+        (set.size || canCheer) ? h("div", { class: "post-actions" },
+          h("button", { class: "cheer", "aria-pressed": String(mine), disabled: canCheer ? null : true, onclick: () => toggleCheer(x.key), "aria-label": (mine ? "Remove cheer" : "Cheer") }, "👏 " + (set.size || "Cheer"))) : null));
+  })));
+  if (ev.length > shown.length) panel.append(h("button", { class: "btn", onclick: () => { S.feedLimit += 20; refresh(); } }, "Show older activity"));
+  return panel;
+}
+
+/* ---------- sheets ---------- */
+let sheetEl = null, sheetReturn = null;
+function openSheet(title, body, foot) {
+  closeSheet();
+  sheetReturn = document.activeElement;
+  const close = h("button", { class: "icon-btn", svg: SVG.x, "aria-label": "Close", onclick: closeSheet });
+  const sheet = h("div", { class: "sheet", role: "dialog", "aria-modal": "true", "aria-label": title }, h("div", { class: "sheet-head" }, h("h2", null, title), close), body, foot ? h("div", { class: "sheet-foot" }, foot) : null);
+  sheetEl = h("div", { class: "scrim", onclick: e => { if (e.target === sheetEl) closeSheet(); } }, sheet);
+  document.body.append(sheetEl);
+  const first = sheet.querySelector("input, textarea, select") || close;
+  setTimeout(() => first.focus());
+  return sheet;
+}
+function closeSheet() {
+  if (!sheetEl) return;
+  sheetEl.remove(); sheetEl = null;
+  if (sheetReturn && sheetReturn.isConnected) sheetReturn.focus();
+}
+document.addEventListener("keydown", e => { if (e.key === "Escape") closeSheet(); });
+
+function openRulesSheet() {
+  openSheet("How XP works", h("div", { style: "display:grid;gap:12px" },
+    h("table", { class: "rules-table" }, h("tbody", null,
+      h("tr", null, h("td", null, "Each check-in"), h("td", null, "+" + BASE_XP)),
+      h("tr", null, h("td", null, "Streak of 3–6 days on that habit"), h("td", null, "×1.5")),
+      h("tr", null, h("td", null, "Streak of 7–13 days"), h("td", null, "×2")),
+      h("tr", null, h("td", null, "Streak of 14+ days"), h("td", null, "×2.5")),
+      h("tr", null, h("td", null, "Perfect day (every habit you have, shared and personal)"), h("td", null, "+" + PERFECT_XP)))),
+    h("p", { class: "muted", style: "margin:0;font-size:14px" }, "You can check in for today or yesterday. Missing a day resets that habit's streak. Levels: Lv 2 at 100 XP, Lv 3 at 300, Lv 4 at 600, and so on; each level needs 100 XP more than the last."),
+    h("p", { class: "muted", style: "margin:0;font-size:14px" }, "Removing a habit removes the XP it earned, for everyone.")));
+}
+function openNickSheet() {
+  if (readOnly()) { toast("You need edit access to change your name here"); return; }
+  const inp = h("input", { type: "text", id: "nick-input", maxlength: "24", value: myNick(), placeholder: "How friends see you" });
+  const save = h("button", { class: "btn primary", type: "submit", form: "nick-form" }, "Save");
+  openSheet("Your player name", h("form", { id: "nick-form", class: "field", onsubmit: async e => {
+    e.preventDefault(); save.disabled = true;
+    try { await saveNick(inp.value); closeSheet(); toast("Name saved"); } catch (err) { writeFailed(err); save.disabled = false; }
+  } }, h("span", null, "Shown on leaderboards in every room"), inp), save);
+}
+function openJoinSheet() {
+  const R = S.room;
+  const inp = h("input", { type: "text", id: "join-nick", maxlength: "24", value: myNick(), placeholder: "How friends see you" });
+  const btn = h("button", { class: "btn primary", type: "submit", form: "join-form" }, "Join " + (R.data.name || "room"));
+  openSheet("Join " + R.data.name, h("form", { id: "join-form", class: "form-section", onsubmit: async e => {
+    e.preventDefault(); btn.disabled = true; btn.textContent = "Joining…";
+    try { await saveNick(inp.value); await joinRoom(R.code); closeSheet(); toast("You're in. Check in to score your first XP."); }
+    catch (err) { writeFailed(err); btn.disabled = false; btn.textContent = "Join"; }
+  } }, h("label", { class: "field" }, h("span", null, "Your player name"), inp),
+    R.data.proof ? h("div", { class: "notice" }, "This room requires proof: each check-in needs a note or a photo.") : null), btn);
+}
+function inviteText(code, name) {
+  const link = ARTIFACT_URL ? ARTIFACT_URL + "#" + code : "";
+  return "Join my habit room \"" + name + "\" on Habit Arena. " + (link ? "Open " + link + " " : "Open Habit Arena ") + "and enter code " + code + ".";
+}
+function copyInvite(code, name) {
+  const text = inviteText(code, name);
+  const show = () => openSheet("Invite friends", h("div", { style: "display:grid;gap:12px" }, h("p", { class: "muted", style: "margin:0" }, "Copy this message and send it to your friends:"), h("div", { class: "copy-box" }, text), shareNote()));
+  try {
+    navigator.clipboard.writeText(text).then(() => toast("Invite copied. Code " + code), show);
+  } catch (_) { show(); }
+}
+function shareNote() {
+  return S.isOwner ? h("p", { class: "muted", style: "margin:0;font-size:13px" }, "Friends also need access to this page. Use Share at the top of the page and add them. Friends outside your organization need the Editor role to check in.") : null;
+}
+function openRoomInfoSheet() {
+  const R = S.room;
+  const confirmBox = h("div");
+  openSheet(R.data.name, h("div", { style: "display:grid;gap:14px" },
+    h("div", null, h("div", { class: "eyebrow" }, "Code"), h("div", { class: "copy-box", style: "letter-spacing:.2em;font-weight:700" }, R.code)),
+    h("p", { class: "muted", style: "margin:0;font-size:14px" }, fmtDate(R.data.start) + " – " + fmtDate(R.data.end) + (R.data.proof ? " · proof required" : " · honor system") + (R.data.allowPersonal ? " · personal habits on" : "")),
+    h("button", { class: "btn", onclick: () => copyInvite(R.code, R.data.name) }, icon("copy"), "Copy invite"),
+    h("div", { style: "border-top:1px solid var(--line);padding-top:14px;display:grid;gap:8px" },
+      h("button", { class: "btn danger", onclick: () => {
+        confirmBox.replaceChildren(h("div", { class: "notice warn" }, "Leaving deletes your check-ins and XP in this room.", h("div", { class: "row", style: "margin-top:8px" },
+          h("button", { class: "btn danger sm", onclick: async () => { try { await leaveRoom(R.code); closeSheet(); location.hash = ""; toast("You left the room"); } catch (err) { writeFailed(err); } } }, "Leave room"),
+          h("button", { class: "btn sm", onclick: () => confirmBox.replaceChildren() } , "Stay"))));
+      } }, "Leave room"), confirmBox)));
+}
+function openSettingsSheet() {
+  const R = S.room, room = clone(R.data), t = todayStr(), ph = phase(room, t);
+  const habits = room.habits || [];
+  const confirmBox = h("div");
+  const save = h("button", { class: "btn primary", type: "submit", form: "settings-form" }, "Save changes");
+  const startIn = h("input", { type: "date", id: "set-start", value: room.start, disabled: ph !== "upcoming" ? true : null });
+  const endIn = h("input", { type: "date", id: "set-end", value: room.end, min: room.start });
+  openSheet("Room settings", h("form", { id: "settings-form", class: "form", onsubmit: async e => {
+    e.preventDefault();
+    const name = $("#set-name").value.trim();
+    const hs = habits.map(x => ({ ...x, name: x.name.trim() })).filter(x => x.name);
+    if (!name) { toast("Give the room a name"); return; }
+    if (!hs.length) { toast("Keep at least one habit"); return; }
+    const start = ph === "upcoming" ? (startIn.value || room.start) : room.start;
+    const end = endIn.value || room.end;
+    if (end < start) { toast("The end date must be after the start date"); return; }
+    const sinceNew = t > start ? t : start;
+    const next = { ...room, name: name.slice(0, 40), start, end, habits: hs.map(x => ({ id: x.id, icon: x.icon, name: x.name, since: ph === "upcoming" ? start : (x.since || sinceNew) })) };
+    save.disabled = true;
+    try { await S.db.doc("rooms/" + R.code).set(next); closeSheet(); toast("Settings saved"); } catch (err) { writeFailed(err); save.disabled = false; }
+  } },
+    h("label", { class: "field" }, h("span", null, "Room name"), h("input", { type: "text", id: "set-name", maxlength: "40", value: room.name })),
+    h("div", { class: "grid2" }, h("label", { class: "field" }, h("span", null, "Starts"), startIn), h("label", { class: "field" }, h("span", null, "Ends"), endIn)),
+    h("div", { class: "form-section" }, h("span", { class: "label" }, "Shared habits"), habitEditor(habits, MAX_SHARED),
+      ph === "active" ? h("p", { class: "muted", style: "margin:0;font-size:13px" }, "New habits count from today. Removing a habit removes the XP it earned.") : null),
+    toggleRow("set-personal", "Personal habits", "Members can add up to " + MAX_PERSONAL + " of their own.", !!room.allowPersonal, v => room.allowPersonal = v),
+    toggleRow("set-proof", "Require proof", "Check-ins need a note or a photo. Earlier check-ins stay as they are.", !!room.proof, v => room.proof = v),
+    h("div", { style: "border-top:1px solid var(--line);padding-top:14px;display:grid;gap:8px" },
+      h("div", null, h("div", { class: "eyebrow" }, "Code"), h("div", { class: "copy-box", style: "letter-spacing:.2em;font-weight:700" }, R.code)),
+      shareNote(),
+      h("button", { type: "button", class: "btn danger", onclick: () => {
+        confirmBox.replaceChildren(h("div", { class: "notice warn" }, "Delete this room for everyone? Scores can't be recovered.", h("div", { class: "row", style: "margin-top:8px" },
+          h("button", { type: "button", class: "btn danger sm", onclick: async () => { try { await deleteRoom(R.code); closeSheet(); location.hash = ""; toast("Room deleted"); } catch (err) { writeFailed(err); } } }, "Delete room"),
+          h("button", { type: "button", class: "btn sm", onclick: () => confirmBox.replaceChildren() }, "Keep it"))));
+      } }, "Delete room"), confirmBox)), save);
+}
+function openAddPersonalSheet() {
+  const draft = { id: "p" + rid(6), icon: "🎸", name: "" };
+  const sel = h("select", { "aria-label": "Icon", onchange: e => draft.icon = e.target.value }, ...ICONS.map(ic => h("option", { value: ic }, ic)));
+  sel.value = draft.icon;
+  const inp = h("input", { type: "text", id: "personal-name", maxlength: "48", placeholder: "e.g. Practice guitar 15 min" });
+  const btn = h("button", { class: "btn primary", type: "submit", form: "personal-form" }, "Add habit");
+  openSheet("Add a personal habit", h("form", { id: "personal-form", class: "form-section", onsubmit: e => {
+    e.preventDefault();
+    const name = inp.value.trim();
+    if (!name) { inp.focus(); return; }
+    const R = S.room, m = R.mine, t = todayStr();
+    m.personal = [...(m.personal || []), { id: draft.id, icon: draft.icon, name, since: t > R.data.start ? t : R.data.start }].slice(0, MAX_PERSONAL);
+    commitMine(); closeSheet(); toast("Habit added");
+  } }, h("div", { class: "habit-edit", style: "grid-template-columns:64px minmax(0,1fr)" }, sel, inp),
+    h("p", { class: "muted", style: "margin:0;font-size:13px" }, "Only you check this one in. It earns XP and counts toward your perfect days from today.")), btn);
+  setTimeout(() => inp.focus());
+}
+function confirmRemovePersonal(hb) {
+  openSheet("Remove " + hb.name + "?", h("p", { class: "muted", style: "margin:0" }, "Its check-ins and the XP they earned will be removed."),
+    [h("button", { class: "btn", onclick: closeSheet }, "Keep"), h("button", { class: "btn danger", onclick: () => {
+      const m = S.room.mine;
+      m.personal = (m.personal || []).filter(x => x.id !== hb.id);
+      for (const d of Object.keys(m.log || {})) { if (m.log[d][hb.id]) { delete m.log[d][hb.id]; if (!Object.keys(m.log[d]).length) delete m.log[d]; } }
+      commitMine(); closeSheet();
+    } }, "Remove")]);
+}
+function openPlayerSheet(uid) {
+  const R = S.room, room = R.data, t = todayStr();
+  const m = uid === S.me && R.mine ? R.mine : R.logs.get(uid);
+  const sc = score(room, m, t), lv = levelOf(sc.xp);
+  openSheet(nameOf(uid), h("div", { style: "display:grid;gap:14px" },
+    h("div", { class: "me-top" }, avatarOf(uid, "lg"), h("div", null, h("div", { class: "lvl" }, "Lv " + lv.L, h("small", null, lv.name)), h("div", { class: "muted mono", style: "font-size:13px" }, fmtNum(sc.xp) + " XP"))),
+    h("div", { class: "stats" },
+      h("div", { class: "stat" }, h("b", null, sc.checkins), h("span", null, "Check-ins")),
+      h("div", { class: "stat" }, h("b", null, sc.perfectDays), h("span", null, "Perfect days")),
+      h("div", { class: "stat" }, h("b", { style: "color:var(--flame)" }, sc.bestStreak), h("span", null, "Best streak")),
+      h("div", { class: "stat" }, h("b", null, sc.proofs), h("span", null, "Proofs"))),
+    weekGrid(room, m, t), badgeGrid(sc)));
+}
+function openProofSheet(hb, date, btnEl) {
+  const R = S.room;
+  let file = null;
+  const note = h("textarea", { id: "proof-note", maxlength: "200", placeholder: "What did you do? e.g. \"Read chapter 4 of Atomic Habits\"" });
+  const preview = h("div");
+  const fileIn = h("input", { type: "file", id: "proof-photo", accept: "image/*", hidden: true, onchange: () => {
+    file = fileIn.files[0] || null;
+    preview.replaceChildren();
+    if (file) { const url = URL.createObjectURL(file); preview.append(h("img", { class: "photo-preview", src: url, alt: "Selected photo" })); }
+  } });
+  const btn = h("button", { class: "btn primary", type: "submit", form: "proof-form" }, "Check in");
+  openSheet("Check in: " + hb.name, h("form", { id: "proof-form", class: "form-section", onsubmit: async e => {
+    e.preventDefault();
+    const text = note.value.trim();
+    if (!text && !file) { toast("Add a note or a photo as proof"); return; }
+    btn.disabled = true; btn.textContent = file ? "Uploading photo…" : "Saving…";
+    const entry = { t: Date.now() };
+    if (text) entry.note = text.slice(0, 200);
+    if (file) {
+      try { entry.photo = await uploadPhoto(file); }
+      catch (err) { toast(err && err.message ? err.message : "The photo didn't upload. Try a smaller one, or post a note instead."); btn.disabled = false; btn.textContent = "Check in"; return; }
+    }
+    closeSheet();
+    applyCheck(hb, date, entry, btnEl);
+  } },
+    h("label", { class: "field" }, h("span", null, "Note"), note),
+    S.assets ? h("div", { class: "row" }, h("label", { class: "btn", for: "proof-photo" }, icon("camera"), "Add photo"), fileIn, h("span", { class: "muted", style: "font-size:13px" }, "Optional. Friends in the room can see it.")) : h("p", { class: "muted", style: "margin:0;font-size:13px" }, "Photos aren't available to you on this page, so a note will do."),
+    preview,
+    h("p", { class: "muted", style: "margin:0;font-size:13px" }, "This room requires proof. A note, a photo, or both.")), btn);
+}
+
+/* ---------- actions ---------- */
+function writeFailed(err) {
+  const code = err && err.code;
+  if (code === "invalid_argument" && S.canWrite !== true) { S.canWrite = false; toast("You can't save here. Ask the owner to share this page with you as an Editor."); renderRoute(); return; }
+  if (code === "quota_exceeded") { toast("This page's storage is full. Delete an old room to make space."); return; }
+  if (code === "revoked") { toast("Your access to this page changed. Reload to continue."); return; }
+  toast("That didn't save. Check your connection and try again.");
+}
+async function saveNick(v) {
+  const nick = (v || "").trim().slice(0, 24);
+  if (!nick || nick === (S.myProfile && S.myProfile.nick)) return;
+  S.myProfile = { ...S.myProfile, nick };
+  refresh();
+  await S.db.doc("people/" + S.me).set({ ...S.myProfile, nick });
+}
+async function createRoom(room) {
+  let code = newCode();
+  for (let i = 0; i < 4; i++) { const s = await S.db.doc("rooms/" + code).get(); if (!s.exists) break; code = newCode(); }
+  await S.db.doc("rooms/" + code).set({ ...room, createdBy: S.me, createdAt: Date.now() });
+  S.roomCache.set(code, { ...room, createdBy: S.me });
+  await joinRoom(code);
+  return code;
+}
+async function joinRoom(code) {
+  await S.db.doc("rooms/" + code + "/members/" + S.me).set({ joinedAt: Date.now() });
+  const ref = S.db.doc("people/" + S.me + "/rooms/" + code);
+  const existing = await ref.get();
+  if (existing.exists) { S.myRooms.set(code, existing.data()); if (S.room && S.room.code === code) S.room.mine = clone(existing.data()); refresh(); return; }
+  const body = { joinedAt: Date.now(), personal: [], log: {}, cheers: {} };
+  S.myRooms.set(code, body);
+  if (S.room && S.room.code === code) S.room.mine = clone(body);
+  refresh();
+  await ref.set(body);
+}
+async function leaveRoom(code) {
+  await S.db.doc("rooms/" + code + "/members/" + S.me).delete();
+  await removeMyRoomDoc(code);
+}
+async function removeMyRoomDoc(code) {
+  try { await S.db.doc("people/" + S.me + "/rooms/" + code).delete(); S.myRooms.delete(code); refresh(); }
+  catch (err) { writeFailed(err); }
+}
+async function deleteRoom(code) {
+  await S.db.doc("rooms/" + code).delete();
+  await leaveRoom(code);
+}
+function toggleHabit(hb, date, btnEl) {
+  const R = S.room, m = R.mine;
+  if (!m || !date || readOnly()) return;
+  const has = m.log && m.log[date] && m.log[date][hb.id];
+  if (has) {
+    const prevXp = score(R.data, m, todayStr()).xp;
+    delete m.log[date][hb.id];
+    if (!Object.keys(m.log[date]).length) delete m.log[date];
+    commitMine();
+    const lost = prevXp - score(R.data, m, todayStr()).xp;
+    toast("Undone" + (lost ? ". −" + lost + " XP" : ""));
+    return;
+  }
+  if (R.data.proof) { openProofSheet(hb, date, btnEl); return; }
+  applyCheck(hb, date, { t: Date.now() }, btnEl);
+}
+function applyCheck(hb, date, entry, btnEl) {
+  const R = S.room, m = R.mine, t = todayStr();
+  const before = score(R.data, m, t);
+  m.log = m.log || {};
+  m.log[date] = { ...(m.log[date] || {}), [hb.id]: entry };
+  const after = score(R.data, m, t);
+  commitMine();
+  const gain = after.xp - before.xp;
+  const wasPerfect = before.days[date] && before.days[date].perfect, isPerfect = after.days[date] && after.days[date].perfect;
+  const l0 = levelOf(before.xp).L, l1 = levelOf(after.xp);
+  toast("+" + gain + " XP" + (isPerfect && !wasPerfect ? " · perfect day!" : ""), isPerfect && !wasPerfect);
+  if (l1.L > l0) setTimeout(() => toast("Level up! Lv " + l1.L + " · " + l1.name, true), 400);
+  for (const b of BADGES) if (b.test(after) && !b.test(before)) setTimeout(() => toast("Badge unlocked: " + b.name, true), 800);
+  requestAnimationFrame(() => { const el = document.querySelector('.check[aria-label="Undo ' + CSS.escape(hb.name) + '"]'); el && el.classList.add("pop"); });
+}
+function toggleCheer(key) {
+  const m = S.room.mine;
+  if (!m) return;
+  m.cheers = { ...(m.cheers || {}) };
+  if (m.cheers[key]) delete m.cheers[key]; else m.cheers[key] = Date.now();
+  const keys = Object.keys(m.cheers);
+  if (keys.length > 300) { keys.sort((a, b) => m.cheers[a] - m.cheers[b]).slice(0, keys.length - 300).forEach(k => delete m.cheers[k]); }
+  commitMine();
+}
+let pending = null, writing = false;
+function commitMine() {
+  const R = S.room;
+  if (!R || !R.mine) return;
+  S.myRooms.set(R.code, clone(R.mine));
+  refresh();
+  pending = { code: R.code, body: clone(R.mine) };
+  flush();
+}
+async function flush() {
+  if (writing || !pending) return;
+  writing = true;
+  const job = pending; pending = null;
+  try { await S.db.doc("people/" + S.me + "/rooms/" + job.code).set(job.body); }
+  catch (err) { writeFailed(err); }
+  writing = false;
+  if (pending) flush();
+}
+async function uploadPhoto(file) {
+  if (!S.assets) throw new Error("Photos aren't available to you on this page.");
+  let blob = file;
+  try {
+    const bmp = await createImageBitmap(file);
+    const k = Math.min(1, 1280 / Math.max(bmp.width, bmp.height));
+    const c = document.createElement("canvas");
+    c.width = Math.round(bmp.width * k); c.height = Math.round(bmp.height * k);
+    c.getContext("2d").drawImage(bmp, 0, 0, c.width, c.height);
+    blob = await new Promise(res => c.toBlob(res, "image/jpeg", 0.82)) || file;
+  } catch (_) {
+    if (!/^image\/(png|jpeg|gif|webp)$/.test(file.type)) throw new Error("That image format isn't supported. Try a JPEG or PNG.");
+  }
+  try {
+    const res = await S.assets.upload(blob, blob.type ? undefined : { type: "image/jpeg" });
+    return res.id;
+  } catch (err) {
+    const code = err && err.code;
+    throw new Error(code === "too_large" ? "That photo is too large." : code === "quota_or_state" ? "Photo storage is full. Post a note instead." : code === "rate_limited" ? "Too many uploads. Wait a moment and try again." : "The photo didn't upload. Post a note instead.");
+  }
+}
+
+/* ---------- data subscriptions ---------- */
+function enterRoom(code) {
+  leaveRoomSubs();
+  S.feedLimit = 12;
+  const R = S.room = { code, data: undefined, members: [], logs: new Map(), nicks: new Map(), unsubs: [], logSubs: new Map(), mine: null, timedOut: false };
+  R.timer = setTimeout(() => { R.timedOut = true; refresh(); }, 10000);
+  if (S.myRooms.has(code)) R.mine = clone(S.myRooms.get(code));
+  R.unsubs.push(S.db.doc("rooms/" + code).onSnapshot(s => {
+    R.data = s.exists ? s.data() : (s.metadata.fromCache ? R.data : null);
+    if (!s.metadata.fromCache) { clearTimeout(R.timer); R.timedOut = false; }
+    if (R.data !== undefined) S.roomCache.set(code, R.data);
+    refresh();
+  }, () => { clearTimeout(R.timer); R.timedOut = true; refresh(); }));
+  R.unsubs.push(S.db.collection("rooms/" + code + "/members").onSnapshot(snap => {
+    R.members = snap.docs.map(d => ({ uid: d.id, ...d.data() })).sort((a, b) => (a.joinedAt || 0) - (b.joinedAt || 0));
+    syncMemberSubs();
+    refresh();
+  }, () => {}));
+  syncMemberSubs();
+}
+function syncMemberSubs() {
+  const R = S.room;
+  const want = new Set(R.members.slice(0, MAX_TRACKED).map(m => m.uid));
+  for (const uid of want) {
+    if (R.logSubs.has(uid) || uid === S.me) continue;
+    R.logSubs.set(uid, S.db.doc("people/" + uid + "/rooms/" + R.code).onSnapshot(s => {
+      if (s.exists) R.logs.set(uid, s.data()); else R.logs.delete(uid);
+      refresh();
+    }, () => {}));
+    S.db.doc("people/" + uid).get().then(s => { if (s.exists && s.data().nick) { R.nicks.set(uid, String(s.data().nick).slice(0, 24)); refresh(); } }).catch(() => {});
+  }
+  for (const [uid, un] of R.logSubs) if (!want.has(uid)) { un(); R.logSubs.delete(uid); R.logs.delete(uid); }
+}
+function leaveRoomSubs() {
+  const R = S.room;
+  if (!R) return;
+  clearTimeout(R.timer);
+  R.unsubs.forEach(u => u());
+  R.logSubs.forEach(u => u());
+  S.room = null;
+}
+
+/* ---------- boot ---------- */
+async function boot() {
+  renderRoute();
+  const c = window.claude;
+  if (!c || !c.use) { S.status = "nodb"; renderRoute(); return; }
+  const [db, user] = await Promise.all([c.use("db"), c.use("user")]);
+  S.db = db; S.user = user;
+  if (!db) { S.status = "nodb"; renderRoute(); return; }
+  S.me = user ? await user.id() : null;
+  if (!S.me) { S.status = "noid"; renderRoute(); return; }
+  S.meInfo = await user.me();
+  S.isOwner = !!S.meInfo.isOwner;
+  S.canWrite = await user.can("data.write");
+  c.use("assets").then(a => { S.assets = a; }).catch(() => {});
+  const timer = setTimeout(() => { S.loadTimedOut = true; refresh(); }, 10000);
+  db.doc("people/" + S.me).onSnapshot(s => { if (s.exists) S.myProfile = { ...s.data() }; refresh(); }, () => {});
+  db.collection("people/" + S.me + "/rooms").onSnapshot(snap => {
+    if (!snap.metadata.fromCache) { clearTimeout(timer); S.loadTimedOut = false; }
+    S.myRoomsLoaded = true;
+    const next = new Map();
+    for (const d of snap.docs) next.set(d.id, d.data());
+    // keep local edits that haven't been confirmed yet
+    if (S.room && (writing || pending) && S.room.mine) next.set(S.room.code, clone(S.room.mine));
+    S.myRooms = next;
+    if (S.room && S.myRooms.has(S.room.code) && !writing && !pending) S.room.mine = clone(S.myRooms.get(S.room.code));
+    if (S.room && S.myRooms.has(S.room.code) && !S.room.mine) S.room.mine = clone(S.myRooms.get(S.room.code));
+    for (const code of next.keys()) {
+      if (S.roomCache.has(code)) continue;
+      S.roomCache.set(code, undefined);
+      db.doc("rooms/" + code).get().then(s => { S.roomCache.set(code, s.exists ? s.data() : null); refresh(); }).catch(() => S.roomCache.delete(code));
+    }
+    refresh();
+  }, () => { clearTimeout(timer); S.myRoomsLoaded = true; refresh(); });
+  S.status = "ready";
+  renderRoute();
+}
+window.addEventListener("hashchange", renderRoute);
+setInterval(() => { if (current && current.view === "room") refresh(); }, 60000);
+boot();
+})();
+</script>

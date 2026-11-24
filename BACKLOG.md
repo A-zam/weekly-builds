@@ -57,3 +57,4 @@ This is the idea pool. Add to it anytime, and when an idea gets built, move it t
 
 ## ✅ Built
 - **Online Queue Booking** → [Week 01: Navbat](weeks/01-queue-booking) 🔨
+- **Competitive Habit Rooms** → [Week 02: Habit Arena](weeks/02-habit-arena) 🔨
