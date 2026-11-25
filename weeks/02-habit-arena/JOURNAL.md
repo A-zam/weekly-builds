@@ -13,7 +13,9 @@ Keep it to 2–4 lines a day: what moved, what's stuck, what got decided.
 - Open question: how many friends are outside the owner's org? They need Editor access, which is the main friction.
 
 ## Wed
--
+- PO asked for a personal tracker that makes people stick, instead of a dull dashboard. The reference was "paint a square per completed habit until it gets huge".
+- Built **My map**: one check-in = one painted square, placed by hand next to your land; terrain per habit; houses for perfect days; realm names as milestones; replay; save as image. Lobby gets a live map preview card.
+- Kept it private (per-user subtree); sharing your map into rooms is a possible next step.
 
 ## Thu
 -

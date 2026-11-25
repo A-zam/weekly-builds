@@ -21,6 +21,7 @@ The plan is to ship it as a **claude.ai artifact** first, because sharing, sign-
 - [x] Honor system by default; the creator can require proof (a note or a photo)
 - [x] Live leaderboard drawn as running lanes, activity feed, cheers
 - [x] Check in for today or yesterday (forgot-to-log grace)
+- [x] **My map** (personal tracker, private): every habit you complete paints one square of land, next to your existing land, wherever you choose. Habits have terrains (forest, lake, dunes, …), perfect days build houses, and the land grows from Campsite to Continent. Includes growth replay and save-as-image.
 
 **Out (on purpose):**
 - Push reminders and notifications (needs a real app)
@@ -37,14 +38,18 @@ One page; all data lives in the artifact's document store.
 | `rooms/<CODE>/members/<uid>` | the player | membership index, so the room can list who's in |
 | `people/<uid>` | **only that player** (access rule) | player name |
 | `people/<uid>/rooms/<CODE>` | **only that player** (access rule) | personal habits, check-in log, cheers given |
+| `data/users/<uid>/tracker` | **only that player**, and nobody else can read it | My map: habits with terrain, and per day per habit the painted square `[x, y, time]` |
 
 XP, streaks, levels and badges are **never stored**. They're recomputed from the check-in log by one pure `score()` function, so they can't drift and anyone can audit them. The leaderboard subscribes to each member's log doc live.
+
+**My map** is drawn on a canvas from the same kind of log: the squares, beach outline, terrain marks, a house on the last square of every perfect day, and the home flag at (0,0). A new square must touch existing land, so the island's shape is the player's own. "Place for me" picks a spot that touches the most squares of the same terrain, so the regions stay clustered.
 
 Access rules: `people` is readable by everyone, and each `people/<uid>` subtree is writable only by its owner (`{self}` rule). Checked after publishing: a write into someone else's subtree is refused.
 
 ## Stack
 - Single HTML file, vanilla JS, no build
-- claude.ai artifact capabilities: `db` (document store and access rules), `user` (identity and names), `assets` (proof photos)
+- claude.ai artifact capabilities: `db` (document store and access rules), `user` (identity and names), `assets` (proof photos), `downloads` (save map image)
+- Canvas 2D for the map (no libraries)
 
 ## Run it
 Open the demo link. To edit: change `artifact/habit-arena.html` and republish it.
