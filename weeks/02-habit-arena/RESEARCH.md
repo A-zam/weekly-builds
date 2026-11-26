@@ -20,8 +20,20 @@
 | Self-determination theory: autonomy, competence and relatedness predict enjoyment and continued play | [Ryan, Rigby & Przybylski 2006](https://link.springer.com/content/pdf/10.1007%2Fs11031-006-9051-8.pdf) | Autonomy: you choose where every square goes. Competence: realms, discoveries, regions. Relatedness: rooms and island visits. |
 | Friction breaks are what actually reduce compulsive app opening; replacing scrolling needs something worth doing | [CHI '24, one sec](https://www.medien.ifi.lmu.de/pubdb/publications/pub/haliburton2024chi/haliburton2024chi.pdf) | The session *ends*: "All painted for today. Now go live your day." There's nothing to scroll. |
 
+## Open-source audit (skills read in full)
+Public repos turned out to be cloneable read-only from the session, so these were read in full: `rondorkerin/gamestack` (pacing, game feel, onboarding checklists), `rshankras/claude-code-apple-skills` (feedback audit, sound design) and `gamedev-skills/awesome-gamedev-agent-skills` (simulator economy). Habit Arena audited against them:
+
+| Rule from the skills | Before | Change |
+|---|---|---|
+| Signature events need ≥2 feedback channels; climaxes must be unmistakably the biggest (feedback audit) | Realm-ups and discoveries were toasts only | Full-screen reveals for realms and discoveries, with their own sound and art; chests keep the shake-and-open sequence |
+| Mid-game sag: schedule novelty; don't front-load everything (pacing) | Nothing new after 100 squares | 3 later discoveries: Harbor (150 squares), Lantern festival (25 perfect days), Observatory (300 squares) |
+| Layer one-time arc payoffs over loops (pacing §D) | No story | **Chronicle**: timeline of founding, realms, discoveries, rare finds and run milestones (7/21/66/100/365 days; 66 = Lally's average) |
+| Ethics test: missing 3 days should lose nothing concrete, only a bonus (pacing §D) | Passed (rest days, revivable wilting) | Kept |
+| Personalisation before the first setback (onboarding §D) | Naming the island was hidden behind a button | Name-your-island prompt right after the first chest |
+| Don't fire one fixed-pitch sample per repeated action (game feel §C) | Pitch ladder only | ±1.75% pitch variation; soft UI clicks |
+| Build the odds panel and the roll from the same list (economy) | "1 in 5" stated, rarity odds hidden | Odds table generated from `RARITY`, the same table `rollItem` uses |
+
 ## Claude skills found on GitHub
-This session could only search other repositories, not read them, so these were reviewed through their search snippets:
 - `rshankras/claude-code-apple-skills`: *game-feel* (celebration choreography, haptic/SFX layers, auditing that every event gives feedback)
 - `rondorkerin/gamestack`: *pacing-and-the-player-journey* (appointment mechanics, compulsion loops, retention ethics), *onboarding-and-teaching*
 - `gamedev-skills/awesome-gamedev-agent-skills`: genre and discipline skills (reward loops, UI/UX)

@@ -27,6 +27,7 @@ Keep it to 2–4 lines a day: what moved, what's stuck, what got decided.
 - Research → RESEARCH.md. Biggest takeaways: variable rewards + collection, forgiveness beats punishment (rest days), overnight change as the reason to return, and a clear end to each session.
 - Built juice (Web Audio, particles, shake), chests and 18 collectibles, living world, day/night, rest days, morning report, island sharing and visits.
 - Test caught: clouds too big (covered the island), item icons too small, Today buried under the collection on phones. All fixed.
+- **Where AI was wrong:** I told the PO I couldn't read other GitHub repos. Wrong: public repos clone read-only from the session. After cloning three skill repos and auditing against them: reveals for big moments, three late-game discoveries, a Chronicle, a naming prompt, an odds table.
 
 ## Sat
 -
