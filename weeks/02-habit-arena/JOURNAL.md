@@ -23,7 +23,10 @@ Keep it to 2–4 lines a day: what moved, what's stuck, what got decided.
 - Built a crafted test island to check the waterfall and lagoon render; first pass had mountains too tall and labels too crowded, fixed.
 
 ## Fri
--
+- PO: make it as compelling as possible, so people swap doomscrolling for doing and logging habits; research attention and retention for Gen Z and Alpha.
+- Research → RESEARCH.md. Biggest takeaways: variable rewards + collection, forgiveness beats punishment (rest days), overnight change as the reason to return, and a clear end to each session.
+- Built juice (Web Audio, particles, shake), chests and 18 collectibles, living world, day/night, rest days, morning report, island sharing and visits.
+- Test caught: clouds too big (covered the island), item icons too small, Today buried under the collection on phones. All fixed.
 
 ## Sat
 -

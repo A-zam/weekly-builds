@@ -28,8 +28,18 @@ The plan is to ship it as a **claude.ai artifact** first, because sharing, sign-
   - **8 discoveries** that appear as you play: fishing boat, lighthouse, old ruins, standing stones, ancient tree, waterfall, hidden lagoon, hot-air balloon
   - **named regions:** 4+ touching squares of one terrain get a generated name ("The Whispering Woods"); you name the island itself
   - growth replay, save as image
+- [x] **Engagement layer**, based on research ([RESEARCH.md](RESEARCH.md)):
+  - **juice:** synthesized sound with a rising pitch ladder, particles, screen shake, "+1", confetti on a perfect day
+  - **chests:** 20% per square, guaranteed on the first square, on a perfect day (better odds) and when reviving a wilting habit; 18 collectibles in 4 rarities that live on the island, with a collection book
+  - **living world:** creatures moving around, windmills turning, chimney smoke, clouds, day/night on the local clock with lit windows, stars and a lighthouse beam
+  - **forgiveness:** rest days (earn 1 per 7-day run, hold 2) instead of resets; wilting is always revivable
+  - **reasons to come back:** morning report of overnight growth, "tomorrow N squares will grow", next-discovery progress bar
+  - **social:** opt-in island sharing; visit friends' islands from a room's leaderboard
+  - **ending:** "All painted for today, go live your day"
 
-![Sample island, made from test data](screenshots/island-sample.png)
+| Living island (sample data) | Chest reveal | Night |
+|---|---|---|
+| ![island](screenshots/island-sample.png) | ![chest](screenshots/chest-reveal-sample.png) | ![night](screenshots/island-night-sample.png) |
 
 **Out (on purpose):**
 - Push reminders and notifications (needs a real app)
@@ -50,7 +60,7 @@ One page; all data lives in the artifact's document store.
 
 XP, streaks, levels and badges are **never stored**. They're recomputed from the check-in log by one pure `score()` function, so they can't drift and anyone can audit them. The leaderboard subscribes to each member's log doc live.
 
-**My island** is drawn on a 2D canvas in isometric projection: blocks of different heights in painter's order, then trees, houses, discoveries and region labels. Like XP, everything is derived from the check-in log and nothing visual is stored. Growth stage comes from each square's age plus the habit's streak, and wilting from the habit's last check-in. Discoveries are found by **replaying** the log in the order squares were painted, so each one stays where it first appeared even as the island grows. A new square must touch existing land, so the island's shape is the player's own.
+**My island** is drawn on a 2D canvas in isometric projection: blocks of different heights in painter's order, then trees, houses, discoveries and region labels. Like XP, everything is derived from the check-in log and nothing visual is stored. Growth stage comes from each square's age plus the habit's streak, and wilting from the habit's last check-in. Discoveries are found by **replaying** the log in the order squares were painted, so each one stays where it first appeared even as the island grows. Chest results are rolled once per check-in and stored (`finds`), so undoing and repainting can't re-roll. The static island is cached to an offscreen canvas; only the living layer (creatures, smoke, clouds, sky, particles) redraws, at about 30 fps, and it pauses when the map is off-screen or the tab is hidden. A new square must touch existing land, so the island's shape is the player's own.
 
 Access rules: `people` is readable by everyone, and each `people/<uid>` subtree is writable only by its owner (`{self}` rule). Checked after publishing: a write into someone else's subtree is refused.
 
