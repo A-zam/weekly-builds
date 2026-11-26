@@ -33,6 +33,21 @@ Public repos turned out to be cloneable read-only from the session, so these wer
 | Don't fire one fixed-pitch sample per repeated action (game feel §C) | Pitch ladder only | ±1.75% pitch variation; soft UI clicks |
 | Build the odds panel and the roll from the same list (economy) | "1 in 5" stated, rarity odds hidden | Odds table generated from `RARITY`, the same table `rollItem` uses |
 
+## Round 2: the full guides
+After the checklists, the full GUIDE.md files were read too: pacing and player journey, game feel and juice, onboarding and teaching, UI/UX and feedback (gamestack), plus feedback recipes and audio design (awesome-gamedev-agent-skills).
+
+| Guide rule | Change |
+|---|---|
+| **Pacing §C.3:** a reskin alone keeps interest for about 10 minutes; novelty has to change gameplay | Every discovery now unlocks a **perk**: Fishing boat → 35% chest chance on your first square of the day; Lighthouse → save 3 rest days; Old ruins → epic and legendary twice as likely; Standing stones → better perfect-day chests; Ancient tree → faster growth; Waterfall → lakes and peaks grow faster; Lagoon → wilting starts at 5 days instead of 3; Balloon → bonus chest every 7-day run; Harbor → duplicates become new items; Lantern festival → two chests on perfect days; Observatory → 50% chest chance after 7 pm. Locked cards say "Unlocks a perk" (*show the lock before the key*). |
+| **Pacing §D.2 (Hades):** every session needs a story payoff, like fresh dialogue | **Pip, the island keeper**: a companion with new lines each day. Lines are chosen from your island's state (overnight growth, rest days used, wilting habits, how close the next discovery is, today's progress) plus a daily-shuffled pool of lore and habit-science lines. Pip also reacts to your first square, a revived habit, a perfect day and a new region. |
+| **Pacing §D.3, ethics:** reward showing up, never punish absence | Perks only add bonuses; the Lagoon perk makes wilting gentler still |
+| **Game feel §C.5 / feedback recipes §1:** trauma-based shake (`trauma²`, smooth layered sines, linear decay), never random per-frame noise | Shake builds when you paint quickly and decays smoothly |
+| **Game feel §C.7, §F:** never animate a value linearly; buttons squish on press | Count-up animation on the square total; buttons squish to 0.94× when pressed |
+| **Game feel §C.9:** rarity ladder; save the top effects for the rarest events | Confetti only on perfect days, epic or legendary finds, new realms and discoveries |
+| **UI §C.4:** success and failure need separate signal vocabularies | Distinct low "nope" sound on an invalid tap |
+| **UI §E.4 / feedback recipes §4:** shake and flashing effects must be optional | **Calm effects** toggle (less shake, particles and confetti), separate from sound; still follows the system reduce-motion setting |
+| **Audio design:** don't let stacked sounds clip; quiet ambience carries the calm moments | Master gain with a compressor/limiter; a very quiet ocean ambience on the island that starts after your first tap, stops when you leave, and follows the mute button |
+
 ## Claude skills found on GitHub
 - `rshankras/claude-code-apple-skills`: *game-feel* (celebration choreography, haptic/SFX layers, auditing that every event gives feedback)
 - `rondorkerin/gamestack`: *pacing-and-the-player-journey* (appointment mechanics, compulsion loops, retention ethics), *onboarding-and-teaching*

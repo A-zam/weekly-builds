@@ -301,6 +301,7 @@ textarea { resize: vertical; min-height: 84px; }
 .map-canvas.dragging { cursor: grabbing; }
 .map-stage.brushing .map-canvas { touch-action: none; cursor: crosshair; }
 .map-zoom { position: absolute; top: 10px; right: 10px; display: grid; gap: 6px; }
+.map-zoom button[aria-pressed="true"] { background: var(--accent); color: var(--accent-ink); border-color: var(--accent); }
 .map-zoom button { width: 36px; height: 36px; border-radius: 10px; border: 1px solid var(--line); background: var(--surface); font-size: 18px; font-weight: 700; line-height: 1; box-shadow: var(--shadow); }
 .brush-banner { position: absolute; left: 10px; right: 56px; bottom: 10px; display: flex; align-items: center; gap: 10px; flex-wrap: wrap; padding: 10px 12px; border-radius: 12px; background: var(--surface); border: 1px solid var(--line); box-shadow: var(--shadow); }
 .brush-banner.quiet { right: 10px; max-width: 460px; }
@@ -355,6 +356,21 @@ textarea { resize: vertical; min-height: 84px; }
 .rest-dots i.on { background: var(--accent); }
 .next-disc { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 6px 10px; font-size: 13.5px; padding-top: 6px; border-top: 1px dashed var(--line); margin-top: 2px; }
 .next-disc .bar { grid-column: 1 / -1; }
+.btn, .chip, .check, .map-zoom button, .cheer { transition: transform .08s ease-out; }
+.btn:active:not([disabled]), .chip:active, .check:active:not([disabled]), .map-zoom button:active, .cheer:active:not([disabled]) { transform: scale(.94); }
+.perk { font-size: 11px; line-height: 1.3; color: var(--good); font-weight: 600; }
+.pip { position: absolute; top: 10px; left: 10px; right: 56px; max-width: 400px; display: grid; grid-template-columns: 46px minmax(0, 1fr) auto; gap: 8px; align-items: start; z-index: 2; }
+.pip.pop .pip-bubble { animation: up .3s ease-out; }
+.pip-face { width: 46px; height: 50px; animation: bob 2.4s ease-in-out infinite; filter: drop-shadow(0 3px 4px rgba(0,0,0,.2)); }
+.pip-face svg { width: 100%; height: 100%; }
+@keyframes bob { 50% { transform: translateY(-3px) rotate(-3deg); } }
+.pip-bubble { position: relative; text-align: left; display: grid; gap: 2px; padding: 9px 12px; border-radius: 14px; background: var(--surface); border: 1px solid var(--line); box-shadow: var(--shadow); font-size: 14px; line-height: 1.4; color: var(--ink); }
+.pip-bubble::before { content: ""; position: absolute; left: -7px; top: 16px; width: 12px; height: 12px; background: var(--surface); border-left: 1px solid var(--line); border-bottom: 1px solid var(--line); transform: rotate(45deg); }
+.pip-name { font-family: var(--f-display); font-weight: 800; font-size: 12px; letter-spacing: .06em; text-transform: uppercase; color: var(--accent); }
+.pip-more { font-size: 11.5px; color: var(--muted); }
+.pip-x { background: var(--surface); border: 1px solid var(--line); }
+.rconf { position: absolute; left: 50%; top: 30%; width: 8px; height: 5px; border-radius: 1px; opacity: 0; animation: rconf 1.8s cubic-bezier(.2,.7,.4,1) var(--d) forwards; pointer-events: none; }
+@keyframes rconf { 0% { opacity: 1; transform: translate(0, 0) rotate(0); } 100% { opacity: 0; transform: translate(var(--x), var(--y)) rotate(var(--r)); } }
 .odds summary { cursor: pointer; font-size: 13px; font-weight: 700; color: var(--accent); }
 .odds table { width: 100%; border-collapse: collapse; font-size: 13px; margin-top: 8px; }
 .odds th, .odds td { text-align: left; padding: 5px 4px; border-top: 1px solid var(--line); }
@@ -639,7 +655,7 @@ function renderRoute() {
   const r = route();
   const view = $("#view");
   view.replaceChildren();
-  if (TR.map) { TR.map.destroy(); TR.map = null; }
+  if (TR.map) { TR.map.destroy(); TR.map = null; SFX.ocean(false); }
   if (TR.thumb) { TR.thumb.destroy(); TR.thumb = null; }
   TR.brush = null;
   if (r.view !== "room" && S.room) leaveRoomSubs();
@@ -1451,6 +1467,19 @@ const DISCOVERIES = [
   { id: "lanterns", name: "Lantern festival", hint: "Have 25 perfect days" },
   { id: "observatory", name: "Observatory", hint: "Grow to 300 squares" },
 ];
+const PERKS = {
+  boat: "Morning catch: your first square each day has a 35% chest chance instead of 20%.",
+  lighthouse: "You can save up to 3 rest days instead of 2.",
+  ruins: "Old secrets: epic and legendary finds are twice as likely in square chests.",
+  stones: "Blessed chests: perfect-day chests roll on better odds.",
+  tree: "Every square grows up faster: in 1 and 4 days instead of 2 and 7.",
+  falls: "Lakes and peaks grow up faster.",
+  lagoon: "Land waits 5 days before it starts to wilt, instead of 3.",
+  balloon: "Every 7 days in a row brings a bonus chest.",
+  harbor: "Shipments: when a chest would give you a duplicate, it gives something you don't have yet, when it can.",
+  lanterns: "Perfect days bring two chests.",
+  observatory: "Stargazing: squares painted after 7 pm have a 50% chest chance.",
+};
 const MAX_MAP_HABITS = 8;
 const TR = { map: null, thumb: null, brush: null, day: "today", ver: 0 };
 const trackerPath = () => "data/users/" + S.me + "/tracker";
@@ -1537,34 +1566,7 @@ function trackerModel(doc, t) {
   }
   tiles.sort((a, b) => a.d < b.d ? -1 : a.d > b.d ? 1 : a.t - b.t);
   const any = d => !!log[d] && Object.keys(log[d]).some(id => byId.has(id));
-  // day run with rest days: every 7 days in a row earns one (max 2); a missed day spends one instead of resetting
-  let dayStreak = 0, bestDay = 0, shields = 0;
-  const restDays = [];
-  if (dates.length) for (let d = dates[0]; d <= t; d = addDays(d, 1)) {
-    if (any(d)) { dayStreak++; if (dayStreak % 7 === 0) shields = Math.min(2, shields + 1); }
-    else if (d < t) { if (dayStreak > 0 && shields > 0) { shields--; restDays.push(d); } else dayStreak = 0; }
-    if (dayStreak > bestDay) bestDay = dayStreak;
-  }
-  const hstat = {};
-  for (const hb of habits) {
-    const done = d => log[d] && log[d][hb.id];
-    let s = 0;
-    for (let d = done(t) ? t : addDays(t, -1); done(d); d = addDays(d, -1)) s++;
-    const mine = tiles.filter(x => x.hid === hb.id);
-    const last = mine.length ? mine[mine.length - 1].d : null;
-    hstat[hb.id] = { count: mine.length, streak: s, last, wilting: !hb.archived && mine.length > 0 && daysBetween(last, t) >= 3 };
-  }
-  // how each square looks today: age + streak make it grow, a 3-day gap makes it wilt
-  for (const tile of tiles) {
-    const hs = hstat[tile.hid], age = daysBetween(tile.d, t), hv = hash2(tile.x, tile.y);
-    tile.age = age;
-    tile.stage = Math.min(2, (age >= 7 ? 2 : age >= 2 ? 1 : 0) + (hs && hs.streak >= 5 ? 1 : 0));
-    tile.wilt = !!(hs && hs.wilting);
-    tile.hv = hv;
-    const j = ((hv % 5) - 2) * 0.035;
-    tile.z = tile.terrain === "lake" ? 0.42 : tile.terrain === "peaks" ? 1.05 + 0.12 * tile.stage + (hv % 3) * 0.06
-      : tile.terrain === "canyon" ? 1.12 + 0.16 * tile.stage + j : tile.terrain === "dunes" ? 0.82 + j : tile.terrain === "crystal" ? 1.05 + j : 0.95 + j;
-  }
+  for (const tile of tiles) tile.hv = hash2(tile.x, tile.y);
   // discoveries, replayed in the order the squares were painted so their spot never moves
   const found = {}, used = new Set(), occ2 = new Map([["0,0", home]]);
   const byDate = new Map();
@@ -1640,6 +1642,36 @@ function trackerModel(doc, t) {
       if ([7, 21, 66, 100, 365].includes(run)) runMarks.push({ d, n: run });
     }
   }
+  // perks unlocked by discoveries feed back into the rules below
+  const perk = id => !!found[id];
+  let dayStreak = 0, bestDay = 0, shields = 0;
+  const restDays = [];
+  if (dates.length) for (let d = dates[0]; d <= t; d = addDays(d, 1)) {
+    const cap = found.lighthouse && d >= found.lighthouse.d ? 3 : 2;
+    if (any(d)) { dayStreak++; if (dayStreak % 7 === 0) shields = Math.min(cap, shields + 1); }
+    else if (d < t) { if (dayStreak > 0 && shields > 0) { shields--; restDays.push(d); } else dayStreak = 0; }
+    if (dayStreak > bestDay) bestDay = dayStreak;
+  }
+  const hstat = {};
+  for (const hb of habits) {
+    const done = d => log[d] && log[d][hb.id];
+    let s = 0;
+    for (let d = done(t) ? t : addDays(t, -1); done(d); d = addDays(d, -1)) s++;
+    const mine = tiles.filter(x => x.hid === hb.id);
+    const last = mine.length ? mine[mine.length - 1].d : null;
+    hstat[hb.id] = { count: mine.length, streak: s, last, wilting: !hb.archived && mine.length > 0 && daysBetween(last, t) >= (perk("lagoon") ? 5 : 3) };
+  }
+  // how each square looks today: age + streak make it grow, a 3-day gap makes it wilt
+  for (const tile of tiles) {
+    const hs = hstat[tile.hid], age = daysBetween(tile.d, t), hv = hash2(tile.x, tile.y);
+    tile.age = age;
+    const fast = perk("tree") || (perk("falls") && (tile.terrain === "lake" || tile.terrain === "peaks"));
+    tile.stage = Math.min(2, (age >= (fast ? 4 : 7) ? 2 : age >= (fast ? 1 : 2) ? 1 : 0) + (hs && hs.streak >= 5 ? 1 : 0));
+    tile.wilt = !!(hs && hs.wilting);
+    const j = ((hv % 5) - 2) * 0.035;
+    tile.z = tile.terrain === "lake" ? 0.42 : tile.terrain === "peaks" ? 1.05 + 0.12 * tile.stage + (hv % 3) * 0.06
+      : tile.terrain === "canyon" ? 1.12 + 0.16 * tile.stage + j : tile.terrain === "dunes" ? 0.82 + j : tile.terrain === "crystal" ? 1.05 + j : 0.95 + j;
+  }
   const onTile = new Map();
   for (const id of ["lighthouse", "ruins", "stones", "tree", "harbor", "observatory"]) if (found[id]) onTile.set(keyOf(found[id].x, found[id].y), id);
   // named regions: 4+ touching squares of one terrain; the oldest square seeds the name
@@ -1671,14 +1703,17 @@ function trackerModel(doc, t) {
   const firstFind = {};
   const addItem = (tile, id, d) => { if (!tile || !ITEM_BY_ID[id]) return; const k = keyOf(tile.x, tile.y); if (!items.has(k)) items.set(k, []); items.get(k).push(id); owned[id] = (owned[id] || 0) + 1; if (!firstFind[id] || d < firstFind[id]) firstFind[id] = d; };
   for (const tile of tiles) { const f = finds[tile.d + "|" + tile.hid]; if (f) addItem(tile, f, tile.d); }
-  for (const d of dates) { const f = finds[d + "|*"]; if (f && perDay[d] && perDay[d].perfect) addItem(chestTileFor(tiles, d, finds), f, d); }
+  for (const d of dates) for (const sfx of ["*", "+", "run"]) {
+    const f = finds[d + "|" + sfx];
+    if (f && (sfx === "run" || (perDay[d] && perDay[d].perfect))) addItem(chestTileFor(tiles, d, finds), f, d);
+  }
   const perfectDays = Object.values(perDay).filter(x => x.perfect).length;
   const next = [
     ["boat", tiles.length, 30, "squares"], ["lighthouse", tiles.length, 50, "squares"], ["ruins", tiles.length, 100, "squares"],
     ["harbor", tiles.length, 150, "squares"], ["observatory", tiles.length, 300, "squares"], ["lanterns", perfectDays, 25, "perfect days"],
     ["stones", perfectDays, 10, "perfect days"], ["tree", maxHrun, 14, "days in a row on one habit"], ["balloon", bestDay, 30, "days in a row"],
   ].filter(([id]) => !found[id]).map(([id, v, goal, unit]) => ({ id, v: Math.min(v, goal), goal, unit, p: Math.min(v, goal) / goal })).sort((a, b) => b.p - a.p);
-  const growTomorrow = tiles.filter(x => x.stage < 2 && (x.age === 1 || x.age === 6)).length;
+  const growTomorrow = tiles.filter(x => x.stage < 2 && (perk("tree") ? x.age === 0 || x.age === 3 : x.age === 1 || x.age === 6)).length;
   const m = { key: ++MODEL_SEQ, habits, tiles, occ, perDay, dayStreak, bestDay, shields, restDays, hstat, found, onTile, regions, lagoons: enclosedCells(occ),
     perfectDays, first: dates[0] || null, items, owned, next, growTomorrow, firstFind, runMarks };
   MEMO = { doc, ver: TR.ver, t, m };
@@ -2112,7 +2147,14 @@ function paintMap(st, now) {
   now = now || performance.now();
   const ctx = st.ctx, live = st.brush || st.anim || st.replay;
   ctx.save();
-  if (st.shake) { const p = (now - st.shake.t0) / 240; if (p >= 1) st.shake = null; else { const m = st.shake.mag * (1 - p); ctx.translate((Math.random() * 2 - 1) * m, (Math.random() * 2 - 1) * m); } }
+  // trauma shake: builds on quick repeats, decays smoothly, driven by layered sines rather than per-frame noise
+  if (st.trauma > 0) {
+    const dt = Math.min(0.05, (now - (st.tLast || now)) / 1000), tt = now / 1000;
+    st.trauma = Math.max(0, st.trauma - 1.8 * dt);
+    const k = st.trauma * st.trauma * 7;
+    ctx.translate(k * (0.6 * Math.sin(tt * 41) + 0.4 * Math.sin(tt * 87 + 1)), k * (0.6 * Math.sin(tt * 53 + 2) + 0.4 * Math.sin(tt * 97 + 3)));
+  }
+  st.tLast = now;
   if (live || !st.useCache) drawMap(ctx, st.w, st.h, st);
   else {
     const dpr = window.devicePixelRatio || 1;
@@ -2133,7 +2175,7 @@ function kickMap(st) {
   if (st.raf) return;
   const loop = ts => {
     st.raf = 0;
-    const busy = st.brush || st.anim || st.replay || st.shake || (st.fx && st.fx.length);
+    const busy = st.brush || st.anim || st.replay || st.trauma > 0 || (st.fx && st.fx.length);
     const alive = st.ambient && !REDUCED && st.visible !== false && !document.hidden;
     if (!busy && !alive) { paintMap(st, ts); return; }
     const gap = st.model && st.model.tiles && st.model.tiles.length > 500 ? 60 : 33;
@@ -2257,13 +2299,20 @@ const ITEMS = [
 ];
 const ITEM_BY_ID = Object.fromEntries(ITEMS.map(i => [i.id, i]));
 const fitsTerrain = (it, terr) => it.t === "any" || (it.t === "land" ? terr !== "lake" : it.t.includes(terr));
-function rollItem(terr, chest) {
-  const ws = RARITY_ORDER.map(k => [k, RARITY[k].w[chest ? 1 : 0]]);
+function chestWeights(found, chest) {
+  const w = RARITY_ORDER.map(k => RARITY[k].w[chest ? 1 : 0]);
+  if (!chest && found && found.ruins) { w[2] *= 2; w[3] *= 2; }
+  if (chest && found && found.stones) return [15, 40, 33, 12];
+  return w;
+}
+function rollItem(terr, chest, found, owned) {
+  const ws = RARITY_ORDER.map((k, i) => [k, chestWeights(found, chest)[i]]);
   let r = Math.random() * ws.reduce((a, b) => a + b[1], 0), rar = "common";
   for (const [k, x] of ws) { if ((r -= x) < 0) { rar = k; break; } }
   let i = RARITY_ORDER.indexOf(rar), pool = [];
   while (i >= 0 && !(pool = ITEMS.filter(x => x.r === RARITY_ORDER[i] && fitsTerrain(x, terr))).length) i--;
   if (!pool.length) pool = ITEMS.filter(x => x.t === "any");
+  if (found && found.harbor && owned) { const fresh = pool.filter(x => !owned[x.id]); if (fresh.length) pool = fresh; }
   return pool[Math.floor(Math.random() * pool.length)].id;
 }
 function chestTileFor(tiles, d, finds) {
@@ -2276,8 +2325,14 @@ function chestTileFor(tiles, d, finds) {
 const SFX = (() => {
   let ac = null, on = true;
   try { on = localStorage.getItem("ha-sound") !== "off"; } catch (_) {}
+  let master = null, ocean = null;
   const ctx = () => {
-    if (!ac) { try { ac = new (window.AudioContext || window.webkitAudioContext)(); } catch (_) { return null; } }
+    if (!ac) {
+      try { ac = new (window.AudioContext || window.webkitAudioContext)(); } catch (_) { return null; }
+      // one master bus with a limiter so stacked effects never clip
+      const comp = ac.createDynamicsCompressor(); comp.threshold.value = -14; comp.knee.value = 8; comp.ratio.value = 8; comp.attack.value = 0.003; comp.release.value = 0.2;
+      master = ac.createGain(); master.gain.value = 0.9; master.connect(comp).connect(ac.destination);
+    }
     if (ac.state === "suspended") ac.resume().catch(() => {});
     return ac;
   };
@@ -2287,7 +2342,7 @@ const SFX = (() => {
     o.type = type || "sine"; o.frequency.setValueAtTime(f, s);
     if (slide) o.frequency.exponentialRampToValueAtTime(slide, s + dur);
     g.gain.setValueAtTime(0.0001, s); g.gain.exponentialRampToValueAtTime(vol || 0.12, s + 0.012); g.gain.exponentialRampToValueAtTime(0.0001, s + dur);
-    o.connect(g).connect(a.destination); o.start(s); o.stop(s + dur + 0.03);
+    o.connect(g).connect(master); o.start(s); o.stop(s + dur + 0.03);
   }
   function noise(t0, dur, vol, hp) {
     const a = ctx(); if (!a) return;
@@ -2295,13 +2350,28 @@ const SFX = (() => {
     for (let i = 0; i < len; i++) d[i] = (Math.random() * 2 - 1) * (1 - i / len);
     const src = a.createBufferSource(), g = a.createGain(), f = a.createBiquadFilter();
     f.type = "highpass"; f.frequency.value = hp || 900; g.gain.value = vol || 0.08;
-    src.buffer = buf; src.connect(f).connect(g).connect(a.destination); src.start(a.currentTime + t0);
+    src.buffer = buf; src.connect(f).connect(g).connect(master); src.start(a.currentTime + t0);
   }
   const SC = [523.25, 587.33, 659.25, 783.99, 880, 1046.5, 1174.66, 1318.51, 1567.98];
   const play = fn => { if (on) try { fn(); } catch (_) {} };
   return {
     get on() { return on; },
-    toggle() { on = !on; try { localStorage.setItem("ha-sound", on ? "on" : "off"); } catch (_) {} if (on) this.tap(); return on; },
+    toggle() { on = !on; try { localStorage.setItem("ha-sound", on ? "on" : "off"); } catch (_) {} if (on) this.tap(); else this.ocean(false); return on; },
+    nope() { play(() => { tone(240, 0, 0.08, "square", 0.04); tone(170, 0.08, 0.12, "square", 0.04); }); },
+    ocean(want) {
+      if (!want || !on) { if (ocean) { try { ocean.src.stop(); ocean.lfo.stop(); } catch (_) {} ocean = null; } return; }
+      if (ocean) return;
+      const a = ctx(); if (!a) return;
+      const len = a.sampleRate * 3, buf = a.createBuffer(1, len, a.sampleRate), d = buf.getChannelData(0);
+      let last = 0; for (let i = 0; i < len; i++) { last = last * 0.97 + (Math.random() * 2 - 1) * 0.03; d[i] = last * 6; }
+      const src = a.createBufferSource(); src.buffer = buf; src.loop = true;
+      const f = a.createBiquadFilter(); f.type = "lowpass"; f.frequency.value = 520;
+      const g = a.createGain(); g.gain.value = 0.014;
+      const lfo = a.createOscillator(), lg = a.createGain(); lfo.frequency.value = 0.09; lg.gain.value = 0.009;
+      lfo.connect(lg).connect(g.gain);
+      src.connect(f).connect(g).connect(master); src.start(); lfo.start();
+      ocean = { src, lfo };
+    },
     tap() { play(() => tone(880, 0, 0.05, "sine", 0.05)); },
     place(step) { play(() => { const f = SC[Math.min(step, SC.length - 1)] * (1 + (Math.random() - 0.5) * 0.035); noise(0, 0.06, 0.05, 1800); tone(f / 2, 0, 0.12, "triangle", 0.16, f * 0.7); tone(f, 0.06, 0.22, "sine", 0.1); }); },
     undo() { play(() => tone(420, 0, 0.14, "sine", 0.07, 240)); },
@@ -2319,6 +2389,8 @@ const SFX = (() => {
     },
   };
 })();
+const CALM = { on: (() => { try { return localStorage.getItem("ha-calm") === "on"; } catch (_) { return false; } })() };
+const calmFx = () => REDUCED || CALM.on;
 const REDUCED = (() => { try { return matchMedia("(prefers-reduced-motion: reduce)").matches; } catch (_) { return false; } })();
 const HOUR_OVERRIDE = (() => { const m = location.search.match(/[?&]hour=(\d+)/); return m ? +m[1] : null; })();
 
@@ -2629,17 +2701,17 @@ function fxBurst(st, wx, wy, z, color) {
   if (!st || !st.w) return;
   const [X, Y] = viewProj(st)(wx, wy, z);
   st.fx = st.fx || [];
-  const n = REDUCED ? 6 : 22;
+  const n = calmFx() ? 6 : 22;
   for (let i = 0; i < n; i++) {
     const a = Math.random() * Math.PI * 2, sp = 60 + Math.random() * 140;
     st.fx.push({ x: X, y: Y, vx: Math.cos(a) * sp, vy: -90 - Math.random() * 180, g: 520, life: 0.6 + Math.random() * 0.5, max: 1.1, size: 2 + Math.random() * 3, color: i % 3 ? color : "#FFFFFF" });
   }
   st.fx.push({ type: "ring", x: X, y: Y, vx: 0, vy: 0, life: 0.5, max: 0.5, size: st.view.s * 0.9 });
   st.fx.push({ type: "text", x: X, y: Y - st.view.s * 0.3, vx: 0, vy: -55, life: 1.1, max: 1.1, size: 22, text: "+1", color: "#FFFFFF" });
-  if (!REDUCED) st.shake = { t0: performance.now(), mag: 3.5 };
+  if (!calmFx()) st.trauma = Math.min(1, (st.trauma || 0) + 0.5);
 }
 function fxConfetti(st) {
-  if (!st || !st.w || REDUCED) return;
+  if (!st || !st.w || calmFx()) return;
   st.fx = st.fx || [];
   const cols = ["#E8483B", "#F5D547", "#3D8FE0", "#53B85B", "#A64DFF", "#FF8FB1", "#FFFFFF"];
   for (let i = 0; i < 90; i++) st.fx.push({ type: "conf", x: Math.random() * st.w, y: -10 - Math.random() * 80, vx: (Math.random() - 0.5) * 80, vy: 80 + Math.random() * 140, g: 90, life: 2.4 + Math.random(), max: 3.4, size: 6 + Math.random() * 5, color: cols[i % cols.length], rot: Math.random() * 6, spin: (Math.random() - 0.5) * 10 });
@@ -2675,7 +2747,7 @@ function nextReveal() {
   } else if (kind === "discovery") {
     const d = DISCOVERIES.find(x => x.id === r.id);
     color = "#18A999"; label = "Discovery"; title = d.name; sound = () => { SFX.open("epic"); setTimeout(() => SFX.perfect(), 350); };
-    lines = ["Something new appeared on " + (islandName() || "your island") + ".", "Unlocked by: " + d.hint.charAt(0).toLowerCase() + d.hint.slice(1) + "."];
+    lines = [PERKS[d.id] ? "Unlocks: " + PERKS[d.id] : "Something new appeared on " + (islandName() || "your island") + ".", "Found because you managed to " + d.hint.charAt(0).toLowerCase() + d.hint.slice(1) + "."];
   } else {
     color = "#F5A300"; label = "New realm"; title = "Your island is now a " + REALMS[r.i][1]; sound = () => SFX.level();
     lines = ["Home became " + HOME_NAMES[r.i] + ".", r.i + 1 < REALMS.length ? "Next: " + REALMS[r.i + 1][1] + " at " + REALMS[r.i + 1][0] + " squares." : "The largest realm there is."];
@@ -2702,7 +2774,14 @@ function nextReveal() {
   if (kind === "item") drawItemIcon(art, r.id, 160);
   else if (kind === "discovery") drawDiscoveryIcon(art, r.id, 160);
   else drawRealmIcon(art, r.i, 160);
-  const open = () => { card.classList.add("open"); sound(); setTimeout(() => btn.focus(), 50); };
+  const big = kind !== "item" || ["epic", "legendary"].includes(ITEM_BY_ID[r.id].r);
+  const open = () => {
+    card.classList.add("open"); sound(); setTimeout(() => btn.focus(), 50);
+    if (big && !calmFx()) {
+      const cols = ["#E8483B", "#F5D547", "#3D8FE0", "#53B85B", "#A64DFF", "#FF8FB1", color];
+      for (let i = 0; i < 40; i++) card.append(h("i", { class: "rconf", style: "--x:" + Math.round(Math.random() * 360 - 180) + "px;--y:" + Math.round(200 + Math.random() * 180) + "px;--r:" + Math.round(Math.random() * 720 - 360) + "deg;--d:" + (Math.random() * 0.3).toFixed(2) + "s;background:" + cols[i % cols.length] }));
+    }
+  };
   if (REDUCED || kind !== "item") setTimeout(open, REDUCED ? 0 : 60);
   else { SFX.shake(); setTimeout(SFX.shake, 380); setTimeout(open, 900); }
 }
@@ -2804,7 +2883,9 @@ function placeTile(x, y) {
   const reveals = [];
   const fk = br.date + "|" + br.hid;
   if (!(fk in doc.finds)) {
-    doc.finds[fk] = first || revived || Math.random() < FIND_CHANCE ? rollItem(terr, false) : "";
+    const F = before.found, firstToday = Object.keys(doc.log[br.date]).length === 1;
+    const chance = Math.max(FIND_CHANCE, F.boat && firstToday ? 0.35 : 0, F.observatory && new Date().getHours() >= 19 && br.date === t ? 0.5 : 0);
+    doc.finds[fk] = first || revived || Math.random() < chance ? rollItem(terr, false, F, before.owned) : "";
     if (doc.finds[fk]) reveals.push({ id: doc.finds[fk], src: first ? "Your first square came with a chest." : revived ? "Comeback chest for reviving " + (hb ? hb.name : "a habit") + "." : "Found while painting " + (hb ? hb.name : "a square") + "." });
   }
   TR.ver++;
@@ -2812,8 +2893,17 @@ function placeTile(x, y) {
   const pd = after.perDay[br.date], wasPerfect = before.perDay[br.date] && before.perDay[br.date].perfect, nowPerfect = !!(pd && pd.perfect && !wasPerfect);
   if (nowPerfect && !((br.date + "|*") in doc.finds)) {
     const tl = chestTileFor(after.tiles, br.date, doc.finds);
-    doc.finds[br.date + "|*"] = rollItem(tl ? tl.terrain : terr, true);
+    doc.finds[br.date + "|*"] = rollItem(tl ? tl.terrain : terr, true, after.found, after.owned);
     reveals.push({ id: doc.finds[br.date + "|*"], src: "Perfect-day chest. Every habit done " + (br.date === t ? "today" : "that day") + "." });
+    if (after.found.lanterns && !((br.date + "|+") in doc.finds)) {
+      doc.finds[br.date + "|+"] = rollItem(tl ? tl.terrain : terr, true, after.found, { ...after.owned, [doc.finds[br.date + "|*"]]: 1 });
+      reveals.push({ id: doc.finds[br.date + "|+"], src: "The lanterns brought a second chest." });
+    }
+    TR.ver++; after = trackerModel(doc, t);
+  }
+  if (after.found.balloon && after.dayStreak > before.dayStreak && after.dayStreak % 7 === 0 && !((br.date + "|run") in doc.finds)) {
+    doc.finds[br.date + "|run"] = rollItem(terr, true, after.found, after.owned);
+    reveals.push({ id: doc.finds[br.date + "|run"], src: "The balloon dropped a bonus chest for " + after.dayStreak + " days in a row." });
     TR.ver++; after = trackerModel(doc, t);
   }
   TR.brush = null;
@@ -2830,15 +2920,16 @@ function placeTile(x, y) {
   SFX.place(doneToday - 1);
   const r0 = realmOf(before.tiles.length), r1 = realmOf(after.tiles.length);
   let delay = 500;
-  if (revived) toast("Revived! Your " + TERRAIN_NAME[terr].toLowerCase() + " is green again.");
-  if (nowPerfect) setTimeout(() => { SFX.perfect(); toast("Perfect day. A house went up on your island.", true); }, delay += 250);
+  if (first) pipSay("Look at that, real land! Every habit you do adds a square. Now let's see what's in that chest.");
+  else if (revived) pipSay("Your " + LAND_IS[terr] + " green again. Told you it would come back.");
+  if (nowPerfect) setTimeout(() => { SFX.perfect(); pipSay("Perfect day! I'm building you a house for it" + (after.growTomorrow ? ". And " + after.growTomorrow + " square" + (after.growTomorrow === 1 ? " grows" : "s grow") + " overnight." : ".")); }, delay += 250);
   const big = [];
   if (r1.i > r0.i) big.push({ kind: "realm", i: r1.i });
   for (const d of DISCOVERIES) if (after.found[d.id] && !before.found[d.id]) big.push({ kind: "discovery", id: d.id });
   big.forEach(r => setTimeout(() => queueReveal(r), delay += 500));
   if (first && !islandName()) TR.askName = true;
   const newRegion = after.regions.find(r => !before.regions.some(b2 => b2.name === r.name));
-  if (newRegion) setTimeout(() => toast("New region: " + newRegion.name, true), delay += 600);
+  if (newRegion) setTimeout(() => pipSay("Four squares of " + TERRAIN_NAME[newRegion.terrain].toLowerCase() + " together. I'm calling that " + newRegion.name + "."), delay += 600);
   const seen = { ...before.owned };
   reveals.forEach(r => { r.count = (seen[r.id] || 0) + 1; r.isNew = !seen[r.id]; seen[r.id] = r.count; setTimeout(() => queueReveal(r), delay + 500); });
 }
@@ -2855,8 +2946,8 @@ function tapCell(x, y) {
     }
     return;
   }
-  if (tile) { toast("That square is already painted"); return; }
-  if (!frontierOf(st.model.occ).has(k)) { toast("Paint a glowing square next to your land"); return; }
+  if (tile) { SFX.nope(); toast("That square is already painted"); return; }
+  if (!frontierOf(st.model.occ).has(k)) { SFX.nope(); toast("Paint a glowing square next to your land"); return; }
   placeTile(x, y);
 }
 function autoPlace() {
@@ -2897,6 +2988,7 @@ function renderMapView(view) {
               h("button", { "aria-label": "Zoom in", onclick: () => TR.map && zoomMap(TR.map, 1.3) }, "+"),
               h("button", { "aria-label": "Zoom out", onclick: () => TR.map && zoomMap(TR.map, 1 / 1.3) }, "−"),
               h("button", { "aria-label": "Fit the whole island", onclick: () => { if (TR.map) { TR.map.auto = true; fitMap(TR.map); paintMap(TR.map); } } }, "⤢"),
+              h("button", { id: "calm-btn", "aria-pressed": String(CALM.on), "aria-label": "Calm effects (less shake and confetti)", title: "Calm effects", svg: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v4M12 17v4M3 12h4M17 12h4M6 6l2.5 2.5M15.5 15.5L18 18M6 18l2.5-2.5M15.5 8.5L18 6"/></svg>', onclick: e => { CALM.on = !CALM.on; try { localStorage.setItem("ha-calm", CALM.on ? "on" : "off"); } catch (_) {} e.currentTarget.setAttribute("aria-pressed", String(CALM.on)); toast(CALM.on ? "Calm effects on: less shake and confetti" : "Full effects on"); } }),
               h("button", { id: "sound-btn", "aria-label": SFX.on ? "Mute sounds" : "Turn sounds on", svg: SFX.on ? SVG.soundOn : SVG.soundOff, onclick: e => { const on = SFX.toggle(); const b = e.currentTarget; b.innerHTML = on ? SVG.soundOn : SVG.soundOff; b.setAttribute("aria-label", on ? "Mute sounds" : "Turn sounds on"); } })),
             h("div", { id: "map-report" }),
             h("div", { id: "map-banner" })),
@@ -2908,6 +3000,7 @@ function renderMapView(view) {
         h("section", { class: "card panel", id: "map-today" }),
         h("section", { class: "card panel", id: "map-legend" }))));
   TR.map = createMap($("#map-stage"), { interactive: true, onTap: tapCell, ambient: true });
+  $("#map-stage").addEventListener("pointerdown", () => SFX.ocean(true), { once: true });
   TR.discDrawn = ""; TR.collDrawn = ""; TR.chronDrawn = ""; TR.reportDone = false;
 }
 function updateMapView() {
@@ -2943,7 +3036,16 @@ function updateMapView() {
   const today = $("#map-today");
   if (today) put(today, mapTodayPanel(model, habits, t));
   const legend = $("#map-legend");
-  if (legend) put(legend, mapLegendPanel(model, habits));
+  if (legend) {
+    put(legend, mapLegendPanel(model, habits));
+    const el = legend.querySelector("[data-countup]"), to = model.tiles.length, from = TR.lastSquares != null ? TR.lastSquares : to;
+    if (el && from !== to && !REDUCED) {
+      const t0 = performance.now();
+      const step = now => { const k = Math.min(1, (now - t0) / 700), e = 1 - Math.pow(1 - k, 3); el.textContent = fmtNum(Math.round(from + (to - from) * e)); if (k < 1 && el.isConnected) requestAnimationFrame(step); };
+      requestAnimationFrame(step);
+    } else if (el) el.textContent = fmtNum(to);
+    TR.lastSquares = to;
+  }
   const coll = $("#map-collection");
   if (coll) {
     const sig = ITEMS.map(i => model.owned[i.id] || 0).join(",") + PAL_VER;
@@ -2966,21 +3068,22 @@ function nextDiscoveryLine(model) {
     h("span", { class: "mono muted" }, n.v + "/" + n.goal + " " + n.unit),
     h("div", { class: "bar", style: "height:6px" }, h("i", { style: "width:" + Math.max(3, n.p * 100) + "%;background:var(--accent)" })));
 }
-function oddsTable() {
-  const tot = i => RARITY_ORDER.reduce((a, k) => a + RARITY[k].w[i], 0);
-  const pct = (k, i) => (RARITY[k].w[i] / tot(i) * 100).toFixed(0) + "%";
+function oddsTable(found) {
+  const W = [chestWeights(found, false), chestWeights(found, true)];
+  const tot = i => W[i].reduce((a, b) => a + b, 0);
+  const pct = (k, i) => (W[i][RARITY_ORDER.indexOf(k)] / tot(i) * 100).toFixed(0) + "%";
   return h("details", { class: "odds" }, h("summary", null, "Chest odds"),
     h("table", null,
       h("thead", null, h("tr", null, h("th", null, "Rarity"), h("th", null, "Square chest"), h("th", null, "Perfect-day chest"))),
       h("tbody", null, RARITY_ORDER.map(k => h("tr", null, h("td", null, h("span", { class: "rdot", style: "background:" + RARITY[k].color }), RARITY[k].name), h("td", null, pct(k, 0)), h("td", null, pct(k, 1)))))),
-    h("p", null, "Free to play: chests are earned by doing habits, never bought. Duplicates add another copy to your island. The items you can get depend on the terrain of the square."));
+    h("p", null, "These odds include any perks you've unlocked. Free to play: chests are earned by doing habits, never bought. The items you can get depend on the terrain of the square."));
 }
 function collectionPanel(model) {
   const have = ITEMS.filter(i => model.owned[i.id]).length;
   return [
     h("div", { class: "panel-head" }, h("h2", { style: "font-size:20px" }, "Collection"), h("span", { class: "eyebrow" }, have + " of " + ITEMS.length)),
     h("p", { class: "muted", style: "margin:0;font-size:13px" }, "Every square you paint has a 1 in 5 chance of a chest. A perfect day always gives one, with better odds. Your first square and a revived habit always do too."),
-    oddsTable(),
+    oddsTable(model.found),
     h("div", { class: "coll" }, ITEMS.map(it => {
       const n = model.owned[it.id] || 0, rc = RARITY[it.r].color;
       if (!n) return h("div", { class: "coll-cell locked", style: "--rc:" + rc, title: RARITY[it.r].name + " · not found yet" }, h("div", { class: "coll-art mystery" }, "?"), h("span", null, RARITY[it.r].name));
@@ -3010,28 +3113,83 @@ function chroniclePanel(model) {
     ev.length > 6 ? h("button", { class: "linkish", style: "justify-self:start;font-size:13px", onclick: () => { TR.chronAll = !TR.chronAll; TR.chronDrawn = ""; refresh(); } }, TR.chronAll ? "Show less" : "Show all " + ev.length) : null,
   ];
 }
+const LAND_IS = { forest: "forest is", lake: "lake is", meadow: "meadow is", dunes: "dunes are", peaks: "peaks are", blossom: "blossom trees are", canyon: "canyon is", crystal: "crystals are" };
+const aOrAn = w => (/^[aeiou]/i.test(w) ? "an " : "a ") + w;
+function strHash(str) { let h2 = 2166136261; for (let i = 0; i < str.length; i++) h2 = Math.imul(h2 ^ str.charCodeAt(i), 16777619); return h2 >>> 0; }
+function pipLines(model, t, report) {
+  const name = islandName() || "the island", hr = HOUR_OVERRIDE != null ? HOUR_OVERRIDE : new Date().getHours();
+  const greet = hr < 5 ? "Up late?" : hr < 12 ? "Morning!" : hr < 18 ? "Hey!" : "Evening.";
+  const habits = model.habits.filter(x => !x.archived), log = (S.tracker && S.tracker.log) || {};
+  const left = habits.filter(hb => activeOn(hb, t) && !(log[t] && log[t][hb.id]));
+  if (!habits.length) return ["Hi, I'm Pip. I look after this island. Add a habit below, then paint your first square. I'll show you what grows."];
+  if (!model.tiles.length) return [greet + " I'm Pip, keeper of " + name + ". Tap one of your habits, then tap the glowing water next to the camp. That's your first piece of land, and it comes with a chest."];
+  const L = [];
+  L.push(report && report.grown ? greet + " While you were away, " + report.grown + " square" + (report.grown === 1 ? "" : "s") + " grew on " + name + "." : greet + " " + name + " is looking good today.");
+  if (report && report.rests) L.push("You missed a day, so I used a rest day. Your " + model.dayStreak + "-day run is safe.");
+  const wilting = habits.filter(hb => model.hstat[hb.id] && model.hstat[hb.id].wilting);
+  if (wilting.length) L.push("Your " + LAND_IS[wilting[0].terrain] + " drooping. One square of " + wilting[0].name + " brings it back, and there's a chest in it for you.");
+  if (!left.length) L.push("Everything's painted today. Go do something fun. I'll keep an eye on things" + (model.growTomorrow ? ", and " + model.growTomorrow + " square" + (model.growTomorrow === 1 ? " is" : "s are") + " about to grow." : "."));
+  else if (left.length <= 2 && left.length < habits.length) L.push("Only " + left.map(x => x.name).join(" and ") + " left for a perfect day. That's a house and a chest.");
+  else L.push(left.length + " habits to paint today. Start with the easiest one.");
+  const n = model.next && model.next[0];
+  if (n) { const d = DISCOVERIES.find(x => x.id === n.id); L.push(n.goal - n.v <= 3 ? "I can feel something close. " + (n.goal - n.v) + " more " + n.unit + " and something new turns up." : "People say " + aOrAn(d.name.toLowerCase()) + " shows up at " + n.goal + " " + n.unit + ". You're at " + n.v + "."); }
+  const reg = model.regions.length ? model.regions[strHash(t) % model.regions.length].name : null;
+  const own = id => model.owned[id];
+  const pool = [
+    reg && own("sheep") && "The sheep wandered into " + reg + " again. I let them.",
+    own("fox") && "The fox keeps stealing mushrooms. I've stopped pretending not to see.",
+    own("dragon") && "The baby dragon sneezed a tiny flame at a cloud. The cloud is fine.",
+    own("whale") && "The whale came close to the shore this morning. I think it likes you.",
+    own("deer") && "A deer stared at me for a whole minute today. I stared back. I won.",
+    own("duck") && "The ducks have started a club. I'm not allowed in.",
+    reg && reg + " is my favourite place to watch the sunset.",
+    model.found.lighthouse && "The lighthouse keeps the boats safe at night. Come and look after 9 pm.",
+    "Missing one day barely changes a habit. Missing lots of days does. That's what rest days are for.",
+    "Most habits feel automatic after about two months. Your run is at " + model.dayStreak + " day" + (model.dayStreak === 1 ? "" : "s") + ".",
+    "Small and daily beats big and rare. Even one square counts.",
+    model.dayStreak >= 5 && "Land grows faster on a 5-day streak. You'll see it.",
+    !own("phoenix") && "I've heard there's a phoenix out there. Nobody I know has seen one.",
+    ITEMS.filter(i => own(i.id)).length + " of " + ITEMS.length + " collectibles found so far. The collection book is below the map.",
+  ].filter(Boolean);
+  let seed = strHash(t + S.me);
+  for (let i = pool.length - 1; i > 0; i--) { seed = Math.imul(seed ^ (seed >>> 15), 2246822507) >>> 0; const j = seed % (i + 1); [pool[i], pool[j]] = [pool[j], pool[i]]; }
+  return L.concat(pool.slice(0, 2));
+}
+function showPip(lines, opts) {
+  const box = $("#map-report");
+  if (!box) return;
+  TR.pip = { lines, i: 0 };
+  const draw = () => {
+    const P = TR.pip;
+    if (!P) { put(box); return; }
+    const more = P.i < P.lines.length - 1;
+    put(box, h("div", { class: "pip" + (opts && opts.pop ? " pop" : "") },
+      h("div", { class: "pip-face", svg: '<svg viewBox="0 0 40 42" aria-hidden="true"><ellipse cx="20" cy="27" rx="13.5" ry="13" fill="#2B3446"/><ellipse cx="20" cy="29" rx="8.5" ry="9.5" fill="#FFFFFF"/><circle cx="20" cy="15" r="10.5" fill="#2B3446"/><ellipse cx="20" cy="16" rx="7.2" ry="6.2" fill="#FFFFFF"/><circle cx="16.8" cy="15" r="1.7" fill="#1A1A1A"/><circle cx="23.2" cy="15" r="1.7" fill="#1A1A1A"/><circle cx="17.3" cy="14.4" r=".5" fill="#fff"/><circle cx="23.7" cy="14.4" r=".5" fill="#fff"/><path d="M17.2 18.4 Q20 16.6 22.8 18.4 L20 23.4 Z" fill="#F08A2B"/><path d="M17.2 18.4 Q20 19.6 22.8 18.4" stroke="#C2601A" stroke-width=".6" fill="none"/><ellipse cx="14.5" cy="40" rx="3.2" ry="1.4" fill="#F08A2B"/><ellipse cx="25.5" cy="40" rx="3.2" ry="1.4" fill="#F08A2B"/></svg>' }),
+      h("button", { class: "pip-bubble", "aria-label": more ? "Pip says: " + P.lines[P.i] + ". Tap for more" : "Pip says: " + P.lines[P.i], onclick: () => { SFX.tap(); if (more) { P.i++; draw(); } else { TR.pip = null; draw(); } } },
+        h("span", { class: "pip-name" }, "Pip"), h("span", null, P.lines[P.i]),
+        h("span", { class: "pip-more" }, more ? "Tap for more · " + (P.i + 1) + "/" + P.lines.length : "Tap to close")),
+      h("button", { class: "icon-btn pip-x", svg: SVG.x, "aria-label": "Hide Pip", onclick: () => { TR.pip = null; draw(); } })));
+  };
+  draw();
+}
+function pipSay(text) {
+  if (!$("#map-report")) return;
+  const rest = TR.pip ? TR.pip.lines.slice(TR.pip.i + 1) : [];
+  showPip([text, ...rest], { pop: true });
+}
 function morningReport(model, t) {
   const box = $("#map-report");
-  if (!box || !model.tiles.length) return;
+  if (!box) return;
   let last = null;
   try { last = localStorage.getItem("ha-seen-" + S.me); localStorage.setItem("ha-seen-" + S.me, t); } catch (_) {}
-  if (!last || last >= t) return;
+  if (!last || last >= t || !model.tiles.length) { showPip(pipLines(model, t, null)); return; }
   const from = daysBetween(last, t) > 7 ? addDays(t, -7) : last;
   const old = trackerModel(S.tracker, from);
   const grownTiles = [], cur = trackerModel(S.tracker, t);
   for (const tile of cur.tiles) { const o = old.occ.get(keyOf(tile.x, tile.y)); if (o && !o.home && o.stage < tile.stage) grownTiles.push(tile); }
   const wilting = cur.habits.filter(hb => cur.hstat[hb.id] && cur.hstat[hb.id].wilting && !(old.hstat[hb.id] && old.hstat[hb.id].wilting));
   const rests = cur.restDays.filter(d => d >= from);
-  if (!grownTiles.length && !wilting.length && !rests.length) return;
-  const days = daysBetween(from, t);
-  const lines = [];
-  if (grownTiles.length) lines.push(grownTiles.length + " square" + (grownTiles.length === 1 ? "" : "s") + " grew" + (days > 1 ? " while you were away" : " overnight") + ".");
-  if (rests.length) lines.push("A rest day kept your run going.");
-  if (wilting.length) lines.push(wilting.map(x => x.name).join(", ") + (wilting.length === 1 ? " is" : " are") + " starting to wilt. One square brings it back, with a chest.");
-  put(box, h("div", { class: "report" },
-    h("div", { class: "eyebrow" }, days > 1 ? "Since your last visit" : "Overnight on " + (islandName() || "your island")),
-    lines.map(l => h("p", null, l)),
-    h("button", { class: "btn sm", onclick: () => put(box) }, "Got it")));
+  showPip(pipLines(cur, t, { grown: grownTiles.length, rests: rests.length }));
   setTimeout(() => { if (TR.map) { fxSparkle(TR.map, grownTiles); kickMap(TR.map); } }, 700);
 }
 function discoveriesPanel(model) {
@@ -3040,10 +3198,10 @@ function discoveriesPanel(model) {
     h("div", { class: "panel-head" }, h("h2", { style: "font-size:20px" }, "Discoveries"), h("span", { class: "eyebrow" }, n + " of " + DISCOVERIES.length + " found")),
     h("div", { class: "discoveries" }, DISCOVERIES.map(d => {
       const f = model.found[d.id];
-      if (!f) return h("div", { class: "disc locked" }, h("div", { class: "disc-art mystery", "aria-hidden": "true" }, "?"), h("b", null, "Undiscovered"), h("span", null, d.hint));
+      if (!f) return h("div", { class: "disc locked" }, h("div", { class: "disc-art mystery", "aria-hidden": "true" }, "?"), h("b", null, "Undiscovered"), h("span", null, d.hint), PERKS[d.id] ? h("span", { class: "perk" }, "Unlocks a perk") : null);
       const cv = h("canvas", { class: "disc-art", width: "64", height: "64", "aria-hidden": "true" });
       requestAnimationFrame(() => drawDiscoveryIcon(cv, d.id));
-      return h("div", { class: "disc" }, cv, h("b", null, d.name), h("span", null, "Found " + fmtDate(f.d)));
+      return h("div", { class: "disc", title: PERKS[d.id] || "" }, cv, h("b", null, d.name), h("span", null, "Found " + fmtDate(f.d)), PERKS[d.id] ? h("span", { class: "perk" }, PERKS[d.id]) : null);
     })),
   ];
 }
@@ -3100,12 +3258,12 @@ function mapTodayPanel(model, habits, t) {
 function mapLegendPanel(model, habits) {
   return [
     h("div", { class: "stats", style: "grid-template-columns:repeat(2,minmax(0,1fr))" },
-      h("div", { class: "stat" }, h("b", null, fmtNum(model.tiles.length)), h("span", null, "Squares of land")),
+      h("div", { class: "stat" }, h("b", { "data-countup": String(model.tiles.length) }, fmtNum(TR.lastSquares != null ? TR.lastSquares : model.tiles.length)), h("span", null, "Squares of land")),
       h("div", { class: "stat" }, h("b", null, model.perfectDays), h("span", null, "Houses (perfect days)")),
       h("div", { class: "stat" }, h("b", { style: "color:var(--flame)" }, model.dayStreak), h("span", null, "Days in a row")),
       h("div", { class: "stat" }, h("b", null, model.bestDay), h("span", null, "Best run"))),
-    h("div", { class: "rest-row" }, h("span", { class: "rest-dots", "aria-hidden": "true" }, [0, 1].map(i => h("i", { class: i < model.shields ? "on" : null }))),
-      h("span", null, h("b", null, model.shields + " rest day" + (model.shields === 1 ? "" : "s") + " saved. "), "Every 7 days in a row earns one (you can hold 2). Miss a day and one is used, so your run keeps going." + (model.restDays.length ? " Used " + model.restDays.length + " so far." : ""))),
+    h("div", { class: "rest-row" }, h("span", { class: "rest-dots", "aria-hidden": "true" }, (model.found.lighthouse ? [0, 1, 2] : [0, 1]).map(i => h("i", { class: i < model.shields ? "on" : null }))),
+      h("span", null, h("b", null, model.shields + " rest day" + (model.shields === 1 ? "" : "s") + " saved. "), "Every 7 days in a row earns one (you can hold " + (model.found.lighthouse ? 3 : 2) + "). Miss a day and one is used, so your run keeps going." + (model.restDays.length ? " Used " + model.restDays.length + " so far." : ""))),
     habits.length ? h("div", { class: "legend" }, h("span", { class: "eyebrow" }, "Terrain"),
       habits.map(hb => { const s = model.hstat[hb.id] || { count: 0 }; return h("div", { class: "legend-row" }, terrainSwatch(hb.terrain), h("span", { class: "legend-name" }, hb.name), h("span", { class: "mono muted" }, s.count)); })) : null,
     model.regions.length ? h("div", { class: "legend" }, h("span", { class: "eyebrow" }, "Regions"),
@@ -3120,6 +3278,7 @@ function addMapHabit(name, terrain) {
   if (active.length >= MAX_MAP_HABITS) { toast("You can keep up to " + MAX_MAP_HABITS + " habits on your island"); return; }
   doc.habits = [...doc.habits, { id: "m" + rid(6), name: name.slice(0, 48), terrain, since: todayStr() }];
   commitTracker();
+  if (active.length === 0) pipSay("Nice pick. Now tap " + name + " below, then tap the glowing water next to the camp. Your first square comes with a chest.");
 }
 function openIslandNameSheet() {
   if (readOnly()) return;

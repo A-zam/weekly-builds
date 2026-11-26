@@ -30,7 +30,9 @@ Keep it to 2–4 lines a day: what moved, what's stuck, what got decided.
 - **Where AI was wrong:** I told the PO I couldn't read other GitHub repos. Wrong: public repos clone read-only from the session. After cloning three skill repos and auditing against them: reveals for big moments, three late-game discoveries, a Chronicle, a naming prompt, an odds table.
 
 ## Sat
--
+- Read the full GUIDE.md files, not just the checklists. Biggest finds: cosmetic-only discoveries are reskins (novelty that fades in about 10 minutes), and loops need story payoffs.
+- Built discovery perks, Pip (a daily companion with lines that react to the island), trauma-based shake, the Calm effects toggle, count-ups, button squish, a "nope" sound, a master limiter and the ocean ambience.
+- Test caught Pip grammar ("a observatory", "the dunes is") and Pip staying quiet after the first habit was added. Fixed.
 
 ## Sun: Ship
 -
