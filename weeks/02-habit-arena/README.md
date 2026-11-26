@@ -21,7 +21,15 @@ The plan is to ship it as a **claude.ai artifact** first, because sharing, sign-
 - [x] Honor system by default; the creator can require proof (a note or a photo)
 - [x] Live leaderboard drawn as running lanes, activity feed, cheers
 - [x] Check in for today or yesterday (forgot-to-log grace)
-- [x] **My map** (personal tracker, private): every habit you complete paints one square of land, next to your existing land, wherever you choose. Habits have terrains (forest, lake, dunes, …), perfect days build houses, and the land grows from Campsite to Continent. Includes growth replay and save-as-image.
+- [x] **My island** (personal tracker, private): every habit you complete adds one square of land, placed by you next to your existing land, on a 3D isometric island
+  - each habit grows its own terrain (forest, lake, meadow, dunes, peaks, blossom, canyon, crystal)
+  - **the world evolves:** squares mature over a week (saplings become forests, mountains grow snow caps), faster during a 5+ day streak; a habit skipped for 3 days **wilts** until you paint it again
+  - perfect days build houses, which get bigger as perfect days add up; home grows with the realm (tent → cottage → tower → keep → castle)
+  - **8 discoveries** that appear as you play: fishing boat, lighthouse, old ruins, standing stones, ancient tree, waterfall, hidden lagoon, hot-air balloon
+  - **named regions:** 4+ touching squares of one terrain get a generated name ("The Whispering Woods"); you name the island itself
+  - growth replay, save as image
+
+![Sample island, made from test data](screenshots/island-sample.png)
 
 **Out (on purpose):**
 - Push reminders and notifications (needs a real app)
@@ -42,7 +50,7 @@ One page; all data lives in the artifact's document store.
 
 XP, streaks, levels and badges are **never stored**. They're recomputed from the check-in log by one pure `score()` function, so they can't drift and anyone can audit them. The leaderboard subscribes to each member's log doc live.
 
-**My map** is drawn on a canvas from the same kind of log: the squares, beach outline, terrain marks, a house on the last square of every perfect day, and the home flag at (0,0). A new square must touch existing land, so the island's shape is the player's own. "Place for me" picks a spot that touches the most squares of the same terrain, so the regions stay clustered.
+**My island** is drawn on a 2D canvas in isometric projection: blocks of different heights in painter's order, then trees, houses, discoveries and region labels. Like XP, everything is derived from the check-in log and nothing visual is stored. Growth stage comes from each square's age plus the habit's streak, and wilting from the habit's last check-in. Discoveries are found by **replaying** the log in the order squares were painted, so each one stays where it first appeared even as the island grows. A new square must touch existing land, so the island's shape is the player's own.
 
 Access rules: `people` is readable by everyone, and each `people/<uid>` subtree is writable only by its owner (`{self}` rule). Checked after publishing: a write into someone else's subtree is refused.
 

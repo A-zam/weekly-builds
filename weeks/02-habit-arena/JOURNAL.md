@@ -18,7 +18,9 @@ Keep it to 2–4 lines a day: what moved, what's stuck, what got decided.
 - Kept it private (per-user subtree); sharing your map into rooms is a possible next step.
 
 ## Thu
--
+- PO: "enrich the visuals so it doesn't become the next default habit tracker." Picked a 3D isometric island + world evolves + discoveries + named regions (skipped ambient animation).
+- Rewrote the map renderer as isometric blocks with objects. Discoveries are derived by replaying history, so no extra writes and positions never jump.
+- Built a crafted test island to check the waterfall and lagoon render; first pass had mountains too tall and labels too crowded, fixed.
 
 ## Fri
 -

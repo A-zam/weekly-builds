@@ -27,7 +27,8 @@
   --f-body: "Figtree", "Segoe UI", system-ui, -apple-system, sans-serif;
   --f-mono: "JetBrains Mono", ui-monospace, "SFMono-Regular", Menlo, monospace;
   --r: 14px;
-  --sea: #CFE2EE; --sea-ink: #B4D0E3; --sand: #EADBB2; --shore: #F5EDD5; --roof: #C8452F;
+  --sea: #BFDDEB; --sea-deep: #8EC0DA; --sea-ink: #D9EEF7; --sand: #EBDDB4; --shore: #EAF6FB; --roof: #C8452F;
+  --earth: #9A7550; --wilt: #A39A7E; --lagoon: #6FD3CC; --map-halo: #FFFFFF;
   --t-forest: #3F8A50; --t-lake: #3A84D0; --t-meadow: #94C46C; --t-dunes: #E0B865; --t-peaks: #8A909D; --t-blossom: #E68FB2; --t-canyon: #C96F48; --t-crystal: #8C6FDB;
 }
 @media (prefers-color-scheme: dark) {
@@ -36,7 +37,8 @@
     --line: #283142; --accent: #6E8CFF; --accent-soft: #1E2949; --accent-ink: #0C1017;
     --xp: #FFC53D; --xp-bright: #FFC53D; --xp-soft: #3A2E10; --good: #3BC985; --flame: #FF8048;
     --danger: #FF6B70; --lane: #344055; --shadow: 0 1px 2px rgba(0,0,0,.3), 0 10px 28px -14px rgba(0,0,0,.6);
-    --sea: #11263A; --sea-ink: #1B3652; --sand: #8A7A55; --shore: #2C3E4E; --roof: #D0563E;
+    --sea: #12354D; --sea-deep: #0A1F30; --sea-ink: #1F4C6B; --sand: #B49E6E; --shore: #2E5B78; --roof: #D0563E;
+  --earth: #6E5136; --wilt: #77705C; --lagoon: #2FA39C; --map-halo: #0C1017;
   --t-forest: #3A7D49; --t-lake: #3577C4; --t-meadow: #74A855; --t-dunes: #C49B4D; --t-peaks: #737B8B; --t-blossom: #C77898; --t-canyon: #AE5F3D; --t-crystal: #775CC4;
     color-scheme: dark;
   }
@@ -46,7 +48,8 @@
   --line: #283142; --accent: #6E8CFF; --accent-soft: #1E2949; --accent-ink: #0C1017;
   --xp: #FFC53D; --xp-bright: #FFC53D; --xp-soft: #3A2E10; --good: #3BC985; --flame: #FF8048;
   --danger: #FF6B70; --lane: #344055; --shadow: 0 1px 2px rgba(0,0,0,.3), 0 10px 28px -14px rgba(0,0,0,.6);
-  --sea: #11263A; --sea-ink: #1B3652; --sand: #8A7A55; --shore: #2C3E4E; --roof: #D0563E;
+  --sea: #12354D; --sea-deep: #0A1F30; --sea-ink: #1F4C6B; --sand: #B49E6E; --shore: #2E5B78; --roof: #D0563E;
+  --earth: #6E5136; --wilt: #77705C; --lagoon: #2FA39C; --map-halo: #0C1017;
   --t-forest: #3A7D49; --t-lake: #3577C4; --t-meadow: #74A855; --t-dunes: #C49B4D; --t-peaks: #737B8B; --t-blossom: #C77898; --t-canyon: #AE5F3D; --t-crystal: #775CC4;
   color-scheme: dark;
 }
@@ -321,6 +324,18 @@ textarea { resize: vertical; min-height: 84px; }
 .terrain-pick { display: flex; flex-wrap: wrap; gap: 6px; }
 .terrain-pick button { width: 30px; height: 30px; border-radius: 8px; border: 2px solid transparent; box-shadow: inset 0 0 0 1px rgba(0,0,0,.12); }
 .terrain-pick button[aria-checked="true"] { border-color: var(--ink); box-shadow: inset 0 0 0 2px var(--surface); }
+.island-title { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+.discoveries { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 10px; }
+.disc { display: grid; justify-items: center; text-align: center; gap: 4px; padding: 10px 6px; border-radius: 12px; background: var(--surface-2); border: 1px solid var(--line); min-width: 0; }
+.disc b { font-size: 13px; line-height: 1.2; }
+.disc span { font-size: 11.5px; color: var(--muted); line-height: 1.3; }
+.disc-art { width: 64px; height: 64px; border-radius: 12px; background: var(--sea); }
+.disc-art.mystery { display: grid; place-items: center; font-family: var(--f-display); font-weight: 800; font-size: 26px; color: var(--muted); background: repeating-linear-gradient(135deg, var(--surface), var(--surface) 6px, var(--surface-2) 6px, var(--surface-2) 12px); border: 1.5px dashed var(--lane); }
+.disc.locked b { color: var(--muted); }
+.wilt-chip { font-size: 12px; font-weight: 700; color: var(--xp); background: color-mix(in srgb, var(--wilt) 30%, var(--surface)); padding: 2px 8px; border-radius: 999px; }
+.grow-chip { font-size: 12px; font-weight: 700; color: var(--good); background: color-mix(in srgb, var(--good) 14%, var(--surface)); padding: 2px 8px; border-radius: 999px; }
+.region-name { font-family: var(--f-display); font-weight: 600; }
+@media (max-width: 480px) { .discoveries { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
 .map-teaser { display: grid; grid-template-columns: minmax(0, 1.2fr) minmax(0, 1fr); overflow: hidden; text-decoration: none; color: inherit; margin-bottom: 20px; }
 .map-teaser:hover { border-color: color-mix(in srgb, var(--accent) 40%, var(--line)); }
 .teaser-stage { position: relative; min-height: 190px; background: var(--sea); }
@@ -359,7 +374,7 @@ textarea { resize: vertical; min-height: 84px; }
       <svg class="brand-mark" viewBox="0 0 32 32" aria-hidden="true"><rect width="32" height="32" rx="9" fill="var(--accent)"/><path d="M6 22c4-9 16-9 20 0" fill="none" stroke="var(--accent-ink)" stroke-width="2.4" stroke-linecap="round"/><path d="M10 22c2.5-5 9.5-5 12 0" fill="none" stroke="var(--accent-ink)" stroke-width="2.4" stroke-linecap="round" opacity=".6"/><circle cx="16" cy="11" r="2.6" fill="var(--xp-bright)"/></svg>
       <span class="brand-name">Habit Arena</span>
     </a>
-    <nav class="nav" aria-label="Sections"><a href="#" id="nav-rooms">Rooms</a><a href="#map" id="nav-map">My map</a></nav>
+    <nav class="nav" aria-label="Sections"><a href="#" id="nav-rooms">Rooms</a><a href="#map" id="nav-map">My island</a></nav>
     </div>
     <div id="me-slot"></div>
   </div>
@@ -1327,9 +1342,33 @@ const TERRAINS = [
 const TERRAIN_NAME = Object.fromEntries(TERRAINS.map(x => [x.k, x.name]));
 const MAP_SUGGEST = [["Workout", "forest"], ["Drink 2L of water", "lake"], ["Meditate 10 min", "meadow"], ["Walk 8,000 steps", "dunes"], ["In bed by 23:00", "peaks"], ["Journal", "blossom"], ["No sugar", "canyon"], ["Read 20 pages", "crystal"]];
 const REALMS = [[0, "Campsite"], [10, "Hamlet"], [30, "Village"], [75, "Town"], [150, "City"], [300, "Kingdom"], [600, "Empire"], [1200, "Continent"]];
+const HOME_NAMES = ["a tent and a campfire", "a cottage", "a house with a flag", "a watchtower", "a keep", "a castle", "a castle", "a castle"];
+const ISLAND_IDEAS = ["Isle of Dawn", "Ember Isle", "Little Haven", "Northwind", "Brightwater", "Kestrel Island", "Larkspur", "Saltmoor", "Juniper Key", "Wren's Rest", "Copperfield", "Mistral Isle"];
+const REGION_WORDS = {
+  forest: [["Whispering", "Elder", "Mossy", "Silent", "Hollow", "Emerald", "Misty", "Old"], ["Woods", "Pines", "Thicket", "Grove", "Forest", "Timberland"]],
+  lake: [["Glass", "Moon", "Still", "Silver", "Blue", "Mirror", "Deep", "Quiet"], ["Lake", "Mere", "Waters", "Pool", "Tarn", "Shallows"]],
+  meadow: [["Sunny", "Green", "Windy", "Clover", "Honey", "Soft", "Gentle", "Bright"], ["Meadows", "Fields", "Downs", "Pastures", "Lea", "Commons"]],
+  dunes: [["Golden", "Shifting", "Amber", "Dry", "Burning", "Long"], ["Dunes", "Sands", "Wastes", "Barrens", "Expanse"]],
+  peaks: [["Iron", "Frost", "Grey", "Thunder", "High", "Lonely", "Stone"], ["Peaks", "Crags", "Summits", "Spires", "Ridge", "Heights"]],
+  blossom: [["Petal", "Rose", "Spring", "Sweet", "Cherry", "Pink"], ["Gardens", "Orchard", "Vale", "Bloom", "Glade"]],
+  canyon: [["Red", "Rust", "Copper", "Sunset", "Broken", "Ember"], ["Canyon", "Gorge", "Mesa", "Bluffs", "Gulch"]],
+  crystal: [["Shimmering", "Star", "Arcane", "Glimmer", "Violet", "Dream"], ["Caverns", "Shards", "Reach", "Spires", "Hollows"]],
+};
+const DISCOVERIES = [
+  { id: "boat", name: "Fishing boat", hint: "Grow to 30 squares" },
+  { id: "lighthouse", name: "Lighthouse", hint: "Grow to 50 squares" },
+  { id: "ruins", name: "Old ruins", hint: "Grow to 100 squares" },
+  { id: "stones", name: "Standing stones", hint: "Have 10 perfect days" },
+  { id: "tree", name: "Ancient tree", hint: "Keep one habit going 14 days in a row" },
+  { id: "falls", name: "Waterfall", hint: "Paint a Lake square right next to a Peaks square" },
+  { id: "lagoon", name: "Hidden lagoon", hint: "Close a patch of sea in with land" },
+  { id: "balloon", name: "Hot-air balloon", hint: "Paint something 30 days in a row" },
+];
 const MAX_MAP_HABITS = 8;
-const TR = { map: null, thumb: null, brush: null, day: "today" };
+const TR = { map: null, thumb: null, brush: null, day: "today", ver: 0 };
 const trackerPath = () => "data/users/" + S.me + "/tracker";
+const DIRS4 = [[1, 0], [-1, 0], [0, 1], [0, -1]];
+const keyOf = (x, y) => x + "," + y;
 
 function realmOf(n) {
   let i = 0;
@@ -1338,25 +1377,72 @@ function realmOf(n) {
   return { i, name: REALMS[i][1], at: REALMS[i][0], next: nx ? nx[0] : null, nextName: nx ? nx[1] : null };
 }
 const activeOn = (hb, d) => (!hb.since || d >= hb.since) && (!hb.archived || d < hb.archived);
+function hash2(x, y) { let n = (x * 374761393 + y * 668265263) | 0; n = Math.imul(n ^ (n >>> 13), 1274126177); return ((n ^ (n >>> 16)) >>> 0); }
 
+function enclosedCells(occ) {
+  let minx = 0, maxx = 0, miny = 0, maxy = 0;
+  for (const t of occ.values()) { if (t.x < minx) minx = t.x; if (t.x > maxx) maxx = t.x; if (t.y < miny) miny = t.y; if (t.y > maxy) maxy = t.y; }
+  minx--; miny--; maxx++; maxy++;
+  const W = maxx - minx + 1, H = maxy - miny + 1, seen = new Uint8Array(W * H), q = [[minx, miny]];
+  seen[0] = 1;
+  while (q.length) {
+    const [x, y] = q.pop();
+    for (const [dx, dy] of DIRS4) {
+      const nx = x + dx, ny = y + dy;
+      if (nx < minx || nx > maxx || ny < miny || ny > maxy) continue;
+      const i = (ny - miny) * W + (nx - minx);
+      if (seen[i] || occ.has(keyOf(nx, ny))) continue;
+      seen[i] = 1; q.push([nx, ny]);
+    }
+  }
+  const out = [];
+  for (let y = miny; y <= maxy; y++) for (let x = minx; x <= maxx; x++) if (!seen[(y - miny) * W + (x - minx)] && !occ.has(keyOf(x, y))) out.push([x, y]);
+  return out;
+}
+function landNeighbors(occ, x, y) { let n = 0; for (const [dx, dy] of DIRS4) if (occ.has(keyOf(x + dx, y + dy))) n++; return n; }
+function pickTile(occ, used, ok, score) {
+  let best = null, bs = -Infinity;
+  for (const t of occ.values()) {
+    if (t.home || used.has(keyOf(t.x, t.y)) || !ok(t)) continue;
+    const sc = score(t);
+    if (sc > bs) { bs = sc; best = t; }
+  }
+  return best;
+}
+function seaSpot(occ) {
+  let best = null, bs = -Infinity;
+  for (const t of occ.values()) for (const [dx, dy] of DIRS4) {
+    const x = t.x + dx, y = t.y + dy;
+    if (occ.has(keyOf(x, y))) continue;
+    const sc = Math.hypot(x, y) + (hash2(x, y) % 100) / 60;
+    if (sc > bs) { bs = sc; best = [x + dx, y + dy]; if (occ.has(keyOf(best[0], best[1]))) best = [x, y]; }
+  }
+  return best || [2, 2];
+}
+
+let MEMO = { doc: null, ver: -1, t: null, m: null };
 function trackerModel(doc, t) {
+  if (MEMO.m && MEMO.doc === doc && MEMO.ver === TR.ver && MEMO.t === t) return MEMO.m;
   const habits = (doc && doc.habits) || [];
   const byId = new Map(habits.map(x => [x.id, x]));
   const log = (doc && doc.log) || {};
-  const tiles = [], occ = new Map([["0,0", { x: 0, y: 0, home: true }]]), perDay = {};
+  const home = { x: 0, y: 0, home: true, z: 1 };
+  const tiles = [], occ = new Map([["0,0", home]]), perDay = {};
   const dates = Object.keys(log).filter(d => d <= t).sort();
   for (const d of dates) {
     const day = log[d] || {};
     let last = null;
+    const dayTiles = [];
     for (const [hid, v] of Object.entries(day)) {
       const hb = byId.get(hid);
       if (!hb || !Array.isArray(v) || !Number.isFinite(v[0]) || !Number.isFinite(v[1])) continue;
-      const k = v[0] + "," + v[1];
+      const k = keyOf(v[0], v[1]);
       if (occ.has(k)) continue;
-      const tile = { x: v[0], y: v[1], t: v[2] || 0, d, hid, terrain: hb.terrain };
-      occ.set(k, tile); tiles.push(tile);
+      const tile = { x: v[0], y: v[1], t: v[2] || 0, d, hid, terrain: TERRAIN_NAME[hb.terrain] ? hb.terrain : "meadow" };
+      occ.set(k, tile); dayTiles.push(tile);
       if (!last || tile.t > last.t) last = tile;
     }
+    tiles.push(...dayTiles);
     const act = habits.filter(hb => activeOn(hb, d));
     const done = act.filter(hb => day[hb.id]).length;
     perDay[d] = { done, active: act.length, perfect: act.length > 0 && done === act.length };
@@ -1366,21 +1452,114 @@ function trackerModel(doc, t) {
   const any = d => !!log[d] && Object.keys(log[d]).some(id => byId.has(id));
   let dayStreak = 0;
   for (let d = any(t) ? t : addDays(t, -1); any(d); d = addDays(d, -1)) dayStreak++;
-  let bestDay = 0, run = 0, prev = null;
-  for (const d of dates) { if (!any(d)) continue; run = prev && addDays(prev, 1) === d ? run + 1 : 1; prev = d; if (run > bestDay) bestDay = run; }
   const hstat = {};
   for (const hb of habits) {
     const done = d => log[d] && log[d][hb.id];
     let s = 0;
     for (let d = done(t) ? t : addDays(t, -1); done(d); d = addDays(d, -1)) s++;
-    hstat[hb.id] = { count: tiles.filter(x => x.hid === hb.id).length, streak: s };
+    const mine = tiles.filter(x => x.hid === hb.id);
+    const last = mine.length ? mine[mine.length - 1].d : null;
+    hstat[hb.id] = { count: mine.length, streak: s, last, wilting: !hb.archived && mine.length > 0 && daysBetween(last, t) >= 3 };
   }
-  return { habits, tiles, occ, perDay, dayStreak, bestDay, hstat, perfectDays: Object.values(perDay).filter(x => x.perfect).length, first: dates[0] || null };
+  // how each square looks today: age + streak make it grow, a 3-day gap makes it wilt
+  for (const tile of tiles) {
+    const hs = hstat[tile.hid], age = daysBetween(tile.d, t), hv = hash2(tile.x, tile.y);
+    tile.stage = Math.min(2, (age >= 7 ? 2 : age >= 2 ? 1 : 0) + (hs && hs.streak >= 5 ? 1 : 0));
+    tile.wilt = !!(hs && hs.wilting);
+    tile.hv = hv;
+    const j = ((hv % 5) - 2) * 0.035;
+    tile.z = tile.terrain === "lake" ? 0.42 : tile.terrain === "peaks" ? 1.05 + 0.12 * tile.stage + (hv % 3) * 0.06
+      : tile.terrain === "canyon" ? 1.12 + 0.16 * tile.stage + j : tile.terrain === "dunes" ? 0.82 + j : tile.terrain === "crystal" ? 1.05 + j : 0.95 + j;
+  }
+  // discoveries, replayed in the order the squares were painted so their spot never moves
+  const found = {}, used = new Set(), occ2 = new Map([["0,0", home]]);
+  const byDate = new Map();
+  for (const tile of tiles) { if (!byDate.has(tile.d)) byDate.set(tile.d, []); byDate.get(tile.d).push(tile); }
+  let n = 0, pd = 0, run = 0, prevDay = null;
+  const hrun = {}, hlast = {};
+  const solid = x => x.terrain !== "lake" && !x.landmark;
+  for (const d of dates) {
+    const dayTiles = byDate.get(d) || [];
+    for (const tile of dayTiles) {
+      occ2.set(keyOf(tile.x, tile.y), tile); n++;
+      if (n === 30 && !found.boat) { const p = seaSpot(occ2); found.boat = { x: p[0], y: p[1], d }; }
+      if (n === 50 && !found.lighthouse) {
+        const tl = pickTile(occ2, used, solid, x => (4 - landNeighbors(occ2, x.x, x.y)) * 10 + Math.hypot(x.x, x.y) + (x.hv % 100) / 100);
+        if (tl) { found.lighthouse = { x: tl.x, y: tl.y, d }; used.add(keyOf(tl.x, tl.y)); }
+      }
+      if (n === 100 && !found.ruins) {
+        const tl = pickTile(occ2, used, x => solid(x) && Math.hypot(x.x, x.y) > 2, x => x.hv);
+        if (tl) { found.ruins = { x: tl.x, y: tl.y, d }; used.add(keyOf(tl.x, tl.y)); }
+      }
+      if (!found.falls && (tile.terrain === "lake" || tile.terrain === "peaks")) {
+        for (const [dx, dy] of DIRS4) {
+          const nb = occ2.get(keyOf(tile.x + dx, tile.y + dy));
+          if (nb && !nb.home && nb.terrain !== tile.terrain && (nb.terrain === "lake" || nb.terrain === "peaks")) {
+            const lake = tile.terrain === "lake" ? tile : nb, peak = lake === tile ? nb : tile;
+            found.falls = { x: lake.x, y: lake.y, px: peak.x, py: peak.y, d };
+            break;
+          }
+        }
+      }
+      if (!found.lagoon && n >= 4 && landNeighbors(occ2, tile.x, tile.y) >= 1) {
+        if (enclosedCells(occ2).length) found.lagoon = { d };
+      }
+    }
+    if (perDay[d] && perDay[d].perfect && ++pd === 10 && !found.stones) {
+      const tl = dayTiles.find(x => solid(x) && !used.has(keyOf(x.x, x.y))) || pickTile(occ2, used, solid, x => x.hv);
+      if (tl) { found.stones = { x: tl.x, y: tl.y, d }; used.add(keyOf(tl.x, tl.y)); }
+    }
+    for (const hb of habits) {
+      if (!(log[d] && log[d][hb.id])) continue;
+      hrun[hb.id] = hlast[hb.id] && addDays(hlast[hb.id], 1) === d ? hrun[hb.id] + 1 : 1;
+      hlast[hb.id] = d;
+      if (hrun[hb.id] === 14 && !found.tree) {
+        const tl = dayTiles.find(x => x.hid === hb.id && solid(x) && !used.has(keyOf(x.x, x.y))) || pickTile(occ2, used, solid, x => x.hv);
+        if (tl) { found.tree = { x: tl.x, y: tl.y, d }; used.add(keyOf(tl.x, tl.y)); }
+      }
+    }
+    if (dayTiles.length) {
+      run = prevDay && addDays(prevDay, 1) === d ? run + 1 : 1; prevDay = d;
+      if (run === 30 && !found.balloon) found.balloon = { d };
+    }
+  }
+  const onTile = new Map();
+  for (const id of ["lighthouse", "ruins", "stones", "tree"]) if (found[id]) onTile.set(keyOf(found[id].x, found[id].y), id);
+  // named regions: 4+ touching squares of one terrain; the oldest square seeds the name
+  const regions = [], seenR = new Set(), usedNames = new Set();
+  for (const tile of tiles) {
+    const k0 = keyOf(tile.x, tile.y);
+    if (seenR.has(k0)) continue;
+    const group = [], q = [tile];
+    seenR.add(k0);
+    while (q.length) {
+      const c = q.pop(); group.push(c);
+      for (const [dx, dy] of DIRS4) {
+        const k = keyOf(c.x + dx, c.y + dy), nb = occ.get(k);
+        if (nb && !nb.home && nb.terrain === tile.terrain && !seenR.has(k)) { seenR.add(k); q.push(nb); }
+      }
+    }
+    if (group.length < 4) continue;
+    const [adj, noun] = REGION_WORDS[tile.terrain] || REGION_WORDS.meadow;
+    let i = 0, name;
+    do { name = "The " + adj[(tile.hv + i) % adj.length] + " " + noun[((tile.hv >>> 7) + i * 3) % noun.length]; i++; } while (usedNames.has(name) && i < 30);
+    usedNames.add(name);
+    const cx = group.reduce((a, g) => a + g.x + 0.5, 0) / group.length, cy = group.reduce((a, g) => a + g.y + 0.5, 0) / group.length;
+    const zTop = Math.max(...group.map(g => g.z));
+    regions.push({ name, terrain: tile.terrain, size: group.length, cx, cy, z: zTop });
+  }
+  regions.sort((a, b) => b.size - a.size);
+  let bestDay = 0, r2 = 0, p2 = null;
+  for (const d of dates) { if (!any(d)) continue; r2 = p2 && addDays(p2, 1) === d ? r2 + 1 : 1; p2 = d; if (r2 > bestDay) bestDay = r2; }
+  const m = { habits, tiles, occ, perDay, dayStreak, bestDay, hstat, found, onTile, regions, lagoons: enclosedCells(occ),
+    perfectDays: Object.values(perDay).filter(x => x.perfect).length, first: dates[0] || null };
+  MEMO = { doc, ver: TR.ver, t, m };
+  return m;
 }
 function frontierOf(occ) {
   const f = new Set();
-  for (const tile of occ.values()) for (const [dx, dy] of [[1, 0], [-1, 0], [0, 1], [0, -1]]) {
-    const k = (tile.x + dx) + "," + (tile.y + dy);
+  for (const tile of occ.values()) for (const [dx, dy] of DIRS4) {
+    const k = keyOf(tile.x + dx, tile.y + dy);
     if (!occ.has(k)) f.add(k);
   }
   return f;
@@ -1391,8 +1570,8 @@ function autoSpot(model, terrain) {
     const [x, y] = k.split(",").map(Number);
     let sc = 0;
     for (const [dx, dy] of [[1, 0], [-1, 0], [0, 1], [0, -1], [1, 1], [-1, -1], [1, -1], [-1, 1]]) {
-      const n = model.occ.get((x + dx) + "," + (y + dy));
-      if (n) { sc += 1; if (n.terrain === terrain) sc += dx && dy ? 1.5 : 3; }
+      const nb = model.occ.get(keyOf(x + dx, y + dy));
+      if (nb) { sc += 1; if (nb.terrain === terrain) sc += dx && dy ? 1.5 : 3; }
     }
     sc -= Math.hypot(x, y) * 0.15;
     sc += Math.random() * 0.8;
@@ -1401,126 +1580,394 @@ function autoSpot(model, terrain) {
   return best || [1, 0];
 }
 
-/* palette, read from the theme tokens */
+/* ---------- palette, read from the theme tokens ---------- */
+function hexRgb(hx) { hx = (hx || "#888888").trim().replace("#", ""); if (hx.length === 3) hx = hx.split("").map(c => c + c).join(""); const n = parseInt(hx, 16); return [n >> 16 & 255, n >> 8 & 255, n & 255]; }
+function mixc(a, b, t) { const A = hexRgb(a), B = hexRgb(b); return "#" + A.map((v, i) => Math.round(v + (B[i] - v) * t).toString(16).padStart(2, "0")).join(""); }
+const shade = (c, f) => f < 0 ? mixc(c, "#000000", -f) : mixc(c, "#ffffff", f);
 let PAL = null;
 function pal() {
   if (PAL) return PAL;
   const cs = getComputedStyle(document.documentElement), v = n => cs.getPropertyValue(n).trim();
-  PAL = { sea: v("--sea"), seaInk: v("--sea-ink"), sand: v("--sand"), shore: v("--shore"), roof: v("--roof"), accent: v("--accent"), gold: v("--xp-bright"), ink: v("--ink"), surface: v("--surface"), muted: v("--muted") };
-  for (const t of TERRAINS) PAL[t.k] = v("--t-" + t.k);
-  return PAL;
+  const P = { sea: v("--sea"), sea2: v("--sea-deep"), seaInk: v("--sea-ink"), sand: v("--sand"), shore: v("--shore"), roof: v("--roof"), accent: v("--accent"), gold: v("--xp-bright"),
+    ink: v("--ink"), surface: v("--surface"), muted: v("--muted"), earth: v("--earth"), wilt: v("--wilt"), lagoon: v("--lagoon"), halo: v("--map-halo"), dark: v("--map-dark") === "1" };
+  P.tops = {}; P.lefts = {}; P.rights = {}; P.wiltTops = {};
+  for (const t of TERRAINS) {
+    const base = v("--t-" + t.k);
+    P[t.k] = base;
+    P.tops[t.k] = base;
+    P.wiltTops[t.k] = mixc(base, P.wilt, 0.55);
+    const sideBase = t.k === "lake" ? P.sand : t.k === "peaks" || t.k === "dunes" || t.k === "canyon" || t.k === "crystal" ? base : P.earth;
+    P.lefts[t.k] = shade(sideBase, -0.14); P.rights[t.k] = shade(sideBase, -0.3);
+  }
+  P.tops.home = P.sand; P.lefts.home = shade(P.earth, -0.14); P.rights.home = shade(P.earth, -0.3);
+  PAL = P;
+  return P;
 }
 function themeChanged() { PAL = null; if (TR.map) paintMap(TR.map); if (TR.thumb) paintMap(TR.thumb); }
 try { matchMedia("(prefers-color-scheme: dark)").addEventListener("change", themeChanged); } catch (_) {}
 new MutationObserver(themeChanged).observe(document.documentElement, { attributes: true, attributeFilter: ["data-theme"] });
 
-/* drawing */
-function hash2(x, y) { let n = (x * 374761393 + y * 668265263) | 0; n = (n ^ (n >>> 13)) * 1274126177; return ((n ^ (n >>> 16)) >>> 0); }
-function glyph(ctx, terrain, px, py, s, seed) {
-  const u = s / 10, cx = px + s / 2 + ((seed % 3) - 1) * u * 0.6, cy = py + s / 2 + (((seed >> 3) % 3) - 1) * u * 0.5;
-  const tri = (bx, by, hw, ht) => { ctx.beginPath(); ctx.moveTo(bx - hw, by); ctx.lineTo(bx, by - ht); ctx.lineTo(bx + hw, by); ctx.closePath(); ctx.fill(); };
-  const dot = (x, y, r) => { ctx.beginPath(); ctx.arc(x, y, r, 0, Math.PI * 2); ctx.fill(); };
-  ctx.lineCap = "round";
-  switch (terrain) {
-    case "forest": ctx.fillStyle = "rgba(8,40,18,.42)"; tri(cx - 1.8 * u, cy + 2.6 * u, 2.2 * u, 5 * u); tri(cx + 2 * u, cy + 3.2 * u, 1.9 * u, 4.2 * u); break;
-    case "lake": ctx.strokeStyle = "rgba(255,255,255,.55)"; ctx.lineWidth = Math.max(1, 0.7 * u);
-      for (const oy of [-1.6, 1.6]) { ctx.beginPath(); ctx.moveTo(cx - 2.6 * u, cy + oy * u); ctx.quadraticCurveTo(cx - 1.3 * u, cy + (oy - 1.2) * u, cx, cy + oy * u); ctx.quadraticCurveTo(cx + 1.3 * u, cy + (oy + 1.2) * u, cx + 2.6 * u, cy + oy * u); ctx.stroke(); } break;
-    case "meadow": ctx.fillStyle = "rgba(255,255,255,.42)"; dot(cx - 2 * u, cy - 1 * u, 0.8 * u); dot(cx + 1.6 * u, cy - 2 * u, 0.7 * u); dot(cx + 0.6 * u, cy + 2 * u, 0.8 * u); break;
-    case "dunes": ctx.strokeStyle = "rgba(110,70,10,.38)"; ctx.lineWidth = Math.max(1, 0.7 * u);
-      ctx.beginPath(); ctx.arc(cx - 1 * u, cy + 3 * u, 3 * u, Math.PI * 1.15, Math.PI * 1.85); ctx.stroke();
-      ctx.beginPath(); ctx.arc(cx + 2 * u, cy + 1 * u, 2.2 * u, Math.PI * 1.2, Math.PI * 1.8); ctx.stroke(); break;
-    case "peaks": ctx.fillStyle = "rgba(20,24,32,.30)"; tri(cx, cy + 3.2 * u, 3.6 * u, 6.4 * u);
-      ctx.fillStyle = "rgba(255,255,255,.85)"; tri(cx, cy - 1.2 * u, 1.1 * u, 2 * u); break;
-    case "blossom": ctx.fillStyle = "rgba(255,255,255,.75)";
-      for (const [dx, dy] of [[-1, 0], [1, 0], [0, -1], [0, 1]]) dot(cx + dx * 1.3 * u, cy + dy * 1.3 * u, 1 * u);
-      ctx.fillStyle = "rgba(255,214,90,.95)"; dot(cx, cy, 0.8 * u); break;
-    case "canyon": ctx.strokeStyle = "rgba(70,20,0,.32)"; ctx.lineWidth = Math.max(1, 0.7 * u);
-      for (const oy of [-2, 0.4, 2.8]) { ctx.beginPath(); ctx.moveTo(px + 1.5 * u, cy + oy * u); ctx.lineTo(px + s - 1.5 * u - (oy > 0 ? 2 * u : 0), cy + oy * u); ctx.stroke(); } break;
-    case "crystal": ctx.fillStyle = "rgba(255,255,255,.5)";
-      ctx.beginPath(); ctx.moveTo(cx, cy - 3 * u); ctx.lineTo(cx + 1.8 * u, cy); ctx.lineTo(cx, cy + 3 * u); ctx.lineTo(cx - 1.8 * u, cy); ctx.closePath(); ctx.fill(); break;
-  }
+/* ---------- isometric drawing ---------- */
+function poly(c, pts, fill) { c.beginPath(); c.moveTo(pts[0][0], pts[0][1]); for (let i = 1; i < pts.length; i++) c.lineTo(pts[i][0], pts[i][1]); c.closePath(); c.fillStyle = fill; c.fill(); }
+function isoBox(R, x0, y0, x1, y1, z0, z1, top, left, right) {
+  const p = R.pr;
+  poly(R.c, [p(x0, y1, z1), p(x1, y1, z1), p(x1, y1, z0), p(x0, y1, z0)], left);
+  poly(R.c, [p(x1, y0, z1), p(x1, y1, z1), p(x1, y1, z0), p(x1, y0, z0)], right);
+  poly(R.c, [p(x0, y0, z1), p(x1, y0, z1), p(x1, y1, z1), p(x0, y1, z1)], top);
 }
-function house(ctx, px, py, s, P) {
-  const u = s / 10, bx = px + 3 * u, by = py + 4.6 * u, bw = 4 * u, bh = 3.4 * u;
-  ctx.lineWidth = Math.max(1, 0.55 * u); ctx.strokeStyle = "rgba(0,0,0,.55)"; ctx.lineJoin = "round";
-  ctx.fillStyle = "#FFFDF7"; ctx.beginPath(); ctx.rect(bx, by, bw, bh); ctx.fill(); ctx.stroke();
-  ctx.fillStyle = P.roof; ctx.beginPath(); ctx.moveTo(bx - 0.9 * u, by + 0.2 * u); ctx.lineTo(bx + bw / 2, by - 2.8 * u); ctx.lineTo(bx + bw + 0.9 * u, by + 0.2 * u); ctx.closePath(); ctx.fill(); ctx.stroke();
+function isoPyramid(R, x0, y0, x1, y1, z0, zt, light, mid, dark) {
+  const p = R.pr, ap = p((x0 + x1) / 2, (y0 + y1) / 2, zt);
+  poly(R.c, [p(x0, y0, z0), p(x1, y0, z0), ap], light);
+  poly(R.c, [p(x0, y0, z0), p(x0, y1, z0), ap], mid);
+  poly(R.c, [p(x0, y1, z0), p(x1, y1, z0), ap], mid);
+  poly(R.c, [p(x1, y0, z0), p(x1, y1, z0), ap], dark);
 }
-function flag(ctx, px, py, s, P) {
-  const u = Math.max(s, 14) / 10, cx = px + s / 2, cy = py + s / 2;
-  ctx.strokeStyle = "rgba(20,20,30,.8)"; ctx.lineWidth = Math.max(1.2, 0.6 * u); ctx.lineCap = "round";
-  ctx.beginPath(); ctx.moveTo(cx - 1.5 * u, cy + 3.6 * u); ctx.lineTo(cx - 1.5 * u, cy - 3.8 * u); ctx.stroke();
-  ctx.fillStyle = P.accent; ctx.beginPath(); ctx.moveTo(cx - 1.2 * u, cy - 3.8 * u); ctx.lineTo(cx + 3 * u, cy - 2.6 * u); ctx.lineTo(cx - 1.2 * u, cy - 1.2 * u); ctx.closePath(); ctx.fill();
+function gableRoof(R, x0, y0, x1, y1, z0, zr, color) {
+  const p = R.pr, ym = (y0 + y1) / 2;
+  poly(R.c, [p(x0, y0, z0), p(x1, y0, z0), p(x1, ym, zr), p(x0, ym, zr)], shade(color, 0.12));
+  poly(R.c, [p(x0, y1, z0), p(x1, y1, z0), p(x1, ym, zr), p(x0, ym, zr)], color);
+  poly(R.c, [p(x1, y0, z0), p(x1, y1, z0), p(x1, ym, zr)], shade(color, -0.25));
 }
-const easeOutBack = p => { const c = 1.7; return 1 + (c + 1) * Math.pow(p - 1, 3) + c * Math.pow(p - 1, 2); };
-function drawMap(ctx, w, h, st) {
-  const P = pal(), s = st.view.s, ox = w / 2 - st.view.cx * s, oy = h / 2 - st.view.cy * s, now = performance.now();
-  ctx.clearRect(0, 0, w, h);
-  ctx.fillStyle = P.sea; ctx.fillRect(0, 0, w, h);
-  const sp = 30, offx = ((ox % sp) + sp) % sp, offy = ((oy % sp) + sp) % sp;
-  ctx.strokeStyle = P.seaInk; ctx.lineWidth = 1.3; ctx.lineCap = "round";
-  for (let y = offy - sp, row = 0; y < h + sp; y += sp, row++) for (let x = offx - sp + (row % 2 ? sp / 2 : 0); x < w + sp; x += sp) {
-    ctx.beginPath(); ctx.moveTo(x - 4, y); ctx.quadraticCurveTo(x - 2, y - 2.5, x, y); ctx.quadraticCurveTo(x + 2, y + 2.5, x + 4, y); ctx.stroke();
-  }
-  const model = st.model;
-  if (!model) return;
-  let tiles = model.tiles;
-  if (st.replay) {
-    const p = Math.min(1, (now - st.replay.start) / st.replay.dur);
-    tiles = tiles.slice(0, Math.floor(p * tiles.length));
-    if (p >= 1) st.replay = null;
-  }
-  const all = [{ x: 0, y: 0, home: true }, ...tiles];
-  const scaleOf = tile => {
-    if (st.replay && tile === tiles[tiles.length - 1]) return 0.6;
-    if (!st.anim || tile.x + "," + tile.y !== st.anim.key) return 1;
-    const p = Math.min(1, (now - st.anim.start) / 380);
-    if (p >= 1) st.anim = null;
-    return Math.max(0.05, easeOutBack(p));
+function blobShadow(R, gx, gy, z, rx) {
+  const [X, Y] = R.pr(gx, gy, z), c = R.c;
+  c.fillStyle = "rgba(0,0,0,.18)"; c.beginPath(); c.ellipse(X, Y, rx * R.s, rx * R.s * 0.5, 0, 0, Math.PI * 2); c.fill();
+}
+function pine(R, gx, gy, z, size, col) {
+  const c = R.c, [X, Y] = R.pr(gx, gy, z), h = size * R.s * 0.62, w = size * R.s * 0.2;
+  blobShadow(R, gx + 0.04, gy + 0.04, z, size * 0.16);
+  c.fillStyle = "#6B4A2B"; c.fillRect(X - w * 0.15, Y - h * 0.18, w * 0.3, h * 0.2);
+  const tier = (base, top, half) => {
+    poly(c, [[X, Y - top], [X - half, Y - base], [X, Y - base + half * 0.32]], shade(col, 0.1));
+    poly(c, [[X, Y - top], [X, Y - base + half * 0.32], [X + half, Y - base]], shade(col, -0.18));
   };
-  const rect = (tile, pad, k) => { const size = (s + pad * 2) * k, px = tile.x * s + ox + s / 2 - size / 2, py = tile.y * s + oy + s / 2 - size / 2; return [px, py, size]; };
-  // beach ring, then shoreline edge
-  const b = Math.max(1.5, s * 0.16);
-  ctx.fillStyle = P.shore;
-  for (const tile of all) { const [px, py, sz] = rect(tile, b * 1.6, scaleOf(tile)); ctx.fillRect(px, py, sz, sz); }
-  ctx.fillStyle = P.sand;
-  for (const tile of all) { const [px, py, sz] = rect(tile, b, scaleOf(tile)); ctx.fillRect(px, py, sz, sz); }
-  for (const tile of all) {
-    const [px, py, sz] = rect(tile, 0, scaleOf(tile));
-    ctx.fillStyle = tile.home ? P.sand : (P[tile.terrain] || P.meadow);
-    ctx.fillRect(px, py, sz + 0.6, sz + 0.6);
+  tier(h * 0.18, h * 0.78, w * 1.15);
+  tier(h * 0.45, h, w * 0.85);
+}
+function roundTree(R, gx, gy, z, size, col, trunk) {
+  const c = R.c, [X, Y] = R.pr(gx, gy, z), r = size * R.s * 0.17;
+  blobShadow(R, gx + 0.05, gy + 0.05, z, size * 0.17);
+  c.fillStyle = trunk || "#6B4A2B"; c.fillRect(X - r * 0.18, Y - r * 1.4, r * 0.36, r * 1.4);
+  c.fillStyle = shade(col, -0.18); c.beginPath(); c.arc(X, Y - r * 1.9, r, 0, Math.PI * 2); c.fill();
+  c.fillStyle = col; c.beginPath(); c.arc(X - r * 0.22, Y - r * 2.05, r * 0.78, 0, Math.PI * 2); c.fill();
+  c.fillStyle = shade(col, 0.22); c.beginPath(); c.arc(X - r * 0.38, Y - r * 2.25, r * 0.32, 0, Math.PI * 2); c.fill();
+}
+function tufts(R, gx, gy, z, col, count, hv) {
+  const c = R.c; c.strokeStyle = col; c.lineWidth = Math.max(1, R.s * 0.018); c.lineCap = "round";
+  for (let i = 0; i < count; i++) {
+    const fx = gx + (((hv >> (i * 3)) % 7) - 3) * 0.09, fy = gy + (((hv >> (i * 3 + 9)) % 7) - 3) * 0.09;
+    const [X, Y] = R.pr(fx, fy, z), hh = R.s * 0.07;
+    c.beginPath(); c.moveTo(X - hh * 0.4, Y - hh); c.lineTo(X, Y); c.lineTo(X + hh * 0.4, Y - hh); c.moveTo(X, Y); c.lineTo(X, Y - hh * 1.2); c.stroke();
   }
-  if (s >= 9) {
-    ctx.strokeStyle = "rgba(0,0,0,.07)"; ctx.lineWidth = 1;
-    for (const tile of all) { const [px, py, sz] = rect(tile, 0, scaleOf(tile)); ctx.strokeRect(px + 0.5, py + 0.5, sz - 1, sz - 1); }
+}
+function dots(R, gx, gy, z, cols, count, hv, r) {
+  const c = R.c;
+  for (let i = 0; i < count; i++) {
+    const fx = gx + (((hv >> (i * 3 + 1)) % 9) - 4) * 0.08, fy = gy + (((hv >> (i * 3 + 11)) % 9) - 4) * 0.08;
+    const [X, Y] = R.pr(fx, fy, z);
+    c.fillStyle = cols[i % cols.length]; c.beginPath(); c.arc(X, Y - R.s * 0.02, R.s * (r || 0.03), 0, Math.PI * 2); c.fill();
   }
-  if (s >= 12) for (const tile of tiles) { const [px, py, sz] = rect(tile, 0, scaleOf(tile)); glyph(ctx, tile.terrain, px, py, sz, hash2(tile.x, tile.y)); }
-  if (s >= 8) for (const tile of tiles) if (tile.landmark) { const [px, py, sz] = rect(tile, 0, scaleOf(tile)); house(ctx, px, py, sz, P); }
-  flag(ctx, ox, oy, s, P);
-  if (st.brush && !st.replay) {
-    const col = P[st.brush.terrain] || P.accent, pulse = 0.55 + 0.35 * Math.sin(now / 260);
-    ctx.save();
-    ctx.setLineDash([Math.max(3, s * 0.18), Math.max(2, s * 0.12)]); ctx.lineWidth = Math.max(1.5, s * 0.07);
-    for (const k of frontierOf(model.occ)) {
-      const [x, y] = k.split(",").map(Number), px = x * s + ox, py = y * s + oy, inset = s * 0.1;
-      ctx.globalAlpha = 0.28 * pulse; ctx.fillStyle = col; ctx.fillRect(px + inset, py + inset, s - inset * 2, s - inset * 2);
-      ctx.globalAlpha = pulse; ctx.strokeStyle = col; ctx.strokeRect(px + inset, py + inset, s - inset * 2, s - inset * 2);
+}
+function crystalShard(R, gx, gy, z, hgt, col) {
+  const c = R.c, [X, Y] = R.pr(gx, gy, z), w = R.s * 0.06, h = R.s * hgt;
+  c.save(); c.shadowColor = shade(col, 0.3); c.shadowBlur = R.s * 0.15;
+  poly(c, [[X - w, Y - h * 0.15], [X, Y - h], [X, Y + w * 0.3]], shade(col, 0.35));
+  poly(c, [[X, Y - h], [X + w, Y - h * 0.15], [X, Y + w * 0.3]], shade(col, -0.1));
+  c.restore();
+}
+function house(R, x, y, z, tier) {
+  const P = R.P, wall = "#F5EFE0", x0 = x + 0.3, x1 = x + 0.7, y0 = y + 0.33, y1 = y + 0.67, hh = tier >= 2 ? 0.75 : 0.45;
+  blobShadow(R, x + 0.55, y + 0.55, z, 0.22);
+  isoBox(R, x0, y0, x1, y1, z, z + hh, wall, "#E2D8C2", "#C9BC9F");
+  if (R.s >= 18) {
+    const [wx, wy] = R.pr(x0 + 0.13, y1, z + hh * 0.55); R.c.fillStyle = "rgba(60,40,20,.55)"; R.c.fillRect(wx - R.s * 0.025, wy - R.s * 0.04, R.s * 0.05, R.s * 0.05);
+    if (tier >= 2) { const [vx, vy] = R.pr(x0 + 0.27, y1, z + hh * 0.22); R.c.fillRect(vx - R.s * 0.025, vy - R.s * 0.04, R.s * 0.05, R.s * 0.06); }
+  }
+  if (tier >= 1) isoBox(R, x0 + 0.06, y0 + 0.04, x0 + 0.13, y0 + 0.11, z + hh, z + hh + 0.42, "#9A6B50", "#86593F", "#704A34");
+  gableRoof(R, x0 - 0.04, y0 - 0.04, x1 + 0.04, y1 + 0.04, z + hh, z + hh + 0.32, P.roof);
+}
+function flagOn(R, gx, gy, z, height, color) {
+  const c = R.c, [X, Y] = R.pr(gx, gy, z), [, Yt] = R.pr(gx, gy, z + height);
+  c.strokeStyle = "#3A3530"; c.lineWidth = Math.max(1, R.s * 0.02); c.beginPath(); c.moveTo(X, Y); c.lineTo(X, Yt); c.stroke();
+  poly(c, [[X, Yt], [X + R.s * 0.16, Yt + R.s * 0.05], [X, Yt + R.s * 0.1]], color);
+}
+function tower(R, x0, y0, x1, y1, z, h, wall, roof) {
+  isoBox(R, x0, y0, x1, y1, z, z + h, wall, shade(wall, -0.1), shade(wall, -0.24));
+  isoPyramid(R, x0 - 0.03, y0 - 0.03, x1 + 0.03, y1 + 0.03, z + h, z + h + 0.55, shade(roof, 0.15), roof, shade(roof, -0.25));
+}
+function homeObject(R, z, tierIdx) {
+  const P = R.P, c = R.c, stone = "#D9D2C3";
+  if (tierIdx === 0) {
+    blobShadow(R, 0.45, 0.5, z, 0.22);
+    isoPyramid(R, 0.22, 0.25, 0.62, 0.62, z, z + 0.85, "#F0A04B", "#E08A35", "#B9662A");
+    const [X, Y] = R.pr(0.78, 0.74, z);
+    c.fillStyle = "#6B4A2B"; c.fillRect(X - R.s * 0.06, Y - R.s * 0.015, R.s * 0.12, R.s * 0.03);
+    c.save(); c.shadowColor = "#FFB347"; c.shadowBlur = R.s * 0.3;
+    poly(c, [[X - R.s * 0.04, Y - R.s * 0.01], [X, Y - R.s * 0.13], [X + R.s * 0.04, Y - R.s * 0.01]], "#FF8A3D");
+    poly(c, [[X - R.s * 0.02, Y - R.s * 0.01], [X, Y - R.s * 0.07], [X + R.s * 0.02, Y - R.s * 0.01]], "#FFE07A");
+    c.restore();
+    return;
+  }
+  if (tierIdx === 1) { house(R, 0, 0, z, 0); return; }
+  if (tierIdx === 2) { house(R, 0, 0, z, 1); flagOn(R, 0.82, 0.25, z, 1.4, P.accent); return; }
+  if (tierIdx === 3) { blobShadow(R, 0.5, 0.5, z, 0.2); tower(R, 0.34, 0.34, 0.66, 0.66, z, 1.5, stone, P.roof); flagOn(R, 0.5, 0.5, z + 2.05, 0.6, P.accent); return; }
+  blobShadow(R, 0.5, 0.5, z, 0.36);
+  if (tierIdx >= 5) {
+    isoBox(R, 0.12, 0.12, 0.88, 0.88, z, z + 0.4, shade(stone, -0.05), shade(stone, -0.15), shade(stone, -0.3));
+    tower(R, 0.1, 0.1, 0.26, 0.26, z, 0.85, stone, P.roof);
+    tower(R, 0.74, 0.1, 0.9, 0.26, z, 0.85, stone, P.roof);
+    tower(R, 0.1, 0.74, 0.26, 0.9, z, 0.85, stone, P.roof);
+  }
+  tower(R, 0.32, 0.32, 0.68, 0.68, z + (tierIdx >= 5 ? 0.4 : 0), 1.6, stone, P.roof);
+  flagOn(R, 0.5, 0.5, z + (tierIdx >= 5 ? 0.4 : 0) + 2.15, 0.7, P.accent);
+  if (tierIdx >= 4) tower(R, 0.62, 0.62, 0.84, 0.84, z, 1.0, stone, P.roof);
+  if (tierIdx >= 5) tower(R, 0.74, 0.74, 0.9, 0.9, z, 0.85, stone, P.roof);
+}
+function discoveryObject(R, id, x, y, z) {
+  const c = R.c, P = R.P, stone = "#CFC8B8";
+  if (id === "lighthouse") {
+    blobShadow(R, x + 0.5, y + 0.5, z, 0.2);
+    for (let i = 0; i < 4; i++) isoBox(R, x + 0.38, y + 0.38, x + 0.62, y + 0.62, z + i * 0.45, z + (i + 1) * 0.45, i % 2 ? "#D94B3B" : "#F7F3EA", i % 2 ? "#C23F31" : "#E5DED0", i % 2 ? "#9E3226" : "#C8C0AE");
+    c.save(); c.shadowColor = "#FFD86B"; c.shadowBlur = R.s * 0.5;
+    isoBox(R, x + 0.4, y + 0.4, x + 0.6, y + 0.6, z + 1.8, z + 2.15, "#FFE89A", "#FFD45E", "#F0B93A");
+    c.restore();
+    isoPyramid(R, x + 0.36, y + 0.36, x + 0.64, y + 0.64, z + 2.15, z + 2.5, "#3E4A5A", "#2E3846", "#232B36");
+  } else if (id === "ruins") {
+    const hs = [0.9, 0.55, 1.1, 0.35];
+    [[0.2, 0.25], [0.5, 0.2], [0.25, 0.6], [0.6, 0.55]].forEach(([fx, fy], i) => isoBox(R, x + fx, y + fy, x + fx + 0.13, y + fy + 0.13, z, z + hs[i], stone, shade(stone, -0.12), shade(stone, -0.28)));
+    isoBox(R, x + 0.55, y + 0.72, x + 0.85, y + 0.84, z, z + 0.12, stone, shade(stone, -0.12), shade(stone, -0.28));
+  } else if (id === "stones") {
+    for (let i = 0; i < 6; i++) {
+      const a = i / 6 * Math.PI * 2, fx = 0.5 + Math.cos(a) * 0.3 - 0.05, fy = 0.5 + Math.sin(a) * 0.3 - 0.05;
+      isoBox(R, x + fx, y + fy, x + fx + 0.1, y + fy + 0.1, z, z + 0.55 + (i % 3) * 0.18, "#A7A296", "#908A7D", "#767064");
     }
-    ctx.restore();
+  } else if (id === "tree") {
+    const [X, Y] = R.pr(x + 0.5, y + 0.5, z), r = R.s * 0.26;
+    blobShadow(R, x + 0.55, y + 0.55, z, 0.34);
+    c.fillStyle = "#5A3B22"; poly(c, [[X - r * 0.25, Y], [X - r * 0.12, Y - r * 1.6], [X + r * 0.12, Y - r * 1.6], [X + r * 0.25, Y]], "#5A3B22");
+    const g = "#2F7A3E";
+    for (const [dx, dy, rr, col] of [[-0.55, -1.9, 0.75, shade(g, -0.2)], [0.55, -1.85, 0.75, shade(g, -0.25)], [0, -2.35, 0.9, g], [-0.25, -2.55, 0.5, shade(g, 0.15)], [0.3, -2.1, 0.45, shade(g, 0.05)]]) {
+      c.fillStyle = col; c.beginPath(); c.arc(X + dx * r, Y + dy * r, rr * r, 0, Math.PI * 2); c.fill();
+    }
+    dots(R, x + 0.5, y + 0.5, z + 1.5, ["#FFD86B"], 3, 0x5a5a5a, 0.018);
+  }
+}
+function boatAt(R, x, y) {
+  const c = R.c, [X, Y] = R.pr(x + 0.5, y + 0.5, 0), s = R.s;
+  c.fillStyle = "rgba(255,255,255,.35)"; c.beginPath(); c.ellipse(X, Y + s * 0.02, s * 0.2, s * 0.06, 0, 0, Math.PI * 2); c.fill();
+  poly(c, [[X - s * 0.17, Y - s * 0.05], [X + s * 0.17, Y - s * 0.05], [X + s * 0.11, Y + s * 0.03], [X - s * 0.11, Y + s * 0.03]], "#7A4E2D");
+  c.strokeStyle = "#3A2A1E"; c.lineWidth = Math.max(1, s * 0.015); c.beginPath(); c.moveTo(X, Y - s * 0.05); c.lineTo(X, Y - s * 0.42); c.stroke();
+  poly(c, [[X + s * 0.01, Y - s * 0.4], [X + s * 0.15, Y - s * 0.09], [X + s * 0.01, Y - s * 0.09]], "#FBF7EE");
+  poly(c, [[X - s * 0.01, Y - s * 0.33], [X - s * 0.11, Y - s * 0.09], [X - s * 0.01, Y - s * 0.09]], "#ECE4D3");
+}
+function balloonAt(R, x, y, zLift) {
+  const c = R.c, P = R.P, [GX, GY] = R.pr(x, y, 1), [X, Y] = R.pr(x, y, zLift), r = R.s * 0.3;
+  c.fillStyle = "rgba(0,0,0,.12)"; c.beginPath(); c.ellipse(GX, GY, r * 0.8, r * 0.35, 0, 0, Math.PI * 2); c.fill();
+  c.strokeStyle = "rgba(60,40,30,.7)"; c.lineWidth = 1;
+  c.beginPath(); c.moveTo(X - r * 0.55, Y + r * 0.6); c.lineTo(X - r * 0.18, Y + r * 1.25); c.moveTo(X + r * 0.55, Y + r * 0.6); c.lineTo(X + r * 0.18, Y + r * 1.25); c.stroke();
+  c.fillStyle = "#8A5A35"; c.fillRect(X - r * 0.2, Y + r * 1.2, r * 0.4, r * 0.28);
+  c.save(); c.beginPath(); c.moveTo(X - r * 0.45, Y + r * 0.7); c.bezierCurveTo(X - r * 1.25, Y - r * 0.2, X - r * 0.8, Y - r * 1.35, X, Y - r * 1.35); c.bezierCurveTo(X + r * 0.8, Y - r * 1.35, X + r * 1.25, Y - r * 0.2, X + r * 0.45, Y + r * 0.7); c.closePath(); c.clip();
+  const cols = [P.accent, P.gold, "#F2EEE4", P.roof];
+  for (let i = -3; i <= 3; i++) { c.fillStyle = cols[(i + 4) % cols.length]; c.fillRect(X + i * r * 0.36 - r * 0.18, Y - r * 1.5, r * 0.36, r * 2.4); }
+  c.fillStyle = "rgba(255,255,255,.18)"; c.fillRect(X - r * 1.3, Y - r * 1.5, r * 0.9, r * 2.4);
+  c.restore();
+}
+function terrainDecor(R, tile) {
+  const { x, y, z, stage, hv, wilt } = tile, P = R.P, s = R.s;
+  const gx = x + 0.5, gy = y + 0.5;
+  if (wilt) tufts(R, gx, gy, z, "#7A6A4A", 3, hv);
+  switch (tile.terrain) {
+    case "forest": {
+      const col = wilt ? mixc(P.forest, P.wilt, 0.6) : shade(P.forest, -0.08);
+      if (stage === 0) pine(R, gx, gy, z, 0.45, col);
+      else if (stage === 1) { pine(R, gx - 0.1, gy - 0.1, z, 0.7, col); pine(R, gx + 0.2, gy + 0.15, z, 0.5, col); }
+      else { pine(R, gx - 0.2, gy - 0.18, z, 0.85, col); pine(R, gx + 0.18, gy - 0.05, z, 0.7, col); pine(R, gx - 0.02, gy + 0.22, z, 0.9, col); }
+      break;
+    }
+    case "meadow":
+      if (!wilt) tufts(R, gx, gy, z, shade(P.meadow, -0.3), 2 + stage, hv);
+      if (stage >= 1 && !wilt) dots(R, gx, gy, z, ["#FFFFFF", "#FFD86B", "#F28DB2"], 2 + stage * 2, hv);
+      if (stage === 2 && hv % 3 === 0) roundTree(R, gx + 0.12, gy - 0.1, z, 0.7, wilt ? P.wilt : "#5FA34A");
+      break;
+    case "lake": {
+      const c = R.c, [X, Y] = R.pr(gx, gy, z);
+      c.strokeStyle = "rgba(255,255,255,.55)"; c.lineWidth = Math.max(1, s * 0.02);
+      c.beginPath(); c.ellipse(X + ((hv % 5) - 2) * s * 0.03, Y, s * 0.12, s * 0.05, 0, Math.PI * 1.1, Math.PI * 1.9); c.stroke();
+      if (stage >= 1 && !wilt) { const [lx, ly] = R.pr(gx - 0.18, gy + 0.12, z); c.fillStyle = "#4E9A4A"; c.beginPath(); c.ellipse(lx, ly, s * 0.06, s * 0.03, 0, 0.3, Math.PI * 2); c.fill(); }
+      if (stage === 2 && !wilt) { tufts(R, gx + 0.25, gy - 0.25, z, "#5B7F3A", 2, hv); dots(R, gx - 0.18, gy + 0.12, z, ["#F7C2D5"], 1, hv, 0.018); }
+      break;
+    }
+    case "dunes":
+      if (stage >= 1) { const [X, Y] = R.pr(gx + 0.1, gy - 0.1, z); R.c.fillStyle = "#B99C6B"; R.c.beginPath(); R.c.ellipse(X, Y - s * 0.02, s * 0.05, s * 0.03, 0, 0, Math.PI * 2); R.c.fill(); }
+      if (stage === 2 && hv % 2 === 0) {
+        const [X, Y] = R.pr(gx - 0.12, gy + 0.08, z), w = s * 0.035, cc = wilt ? P.wilt : "#4E8F4A";
+        R.c.fillStyle = cc; R.c.fillRect(X - w / 2, Y - s * 0.3, w, s * 0.3);
+        R.c.fillRect(X - w * 2.2, Y - s * 0.2, w * 0.8, s * 0.1); R.c.fillRect(X - w * 2.2, Y - s * 0.14, w * 2, w * 0.8);
+        R.c.fillRect(X + w * 1.4, Y - s * 0.25, w * 0.8, s * 0.1); R.c.fillRect(X + w * 0.5, Y - s * 0.17, w * 1.7, w * 0.8);
+      }
+      break;
+    case "peaks": {
+      const pk = wilt ? mixc(P.peaks, P.wilt, 0.4) : P.peaks, ht = 0.45 + stage * 0.3 + (hv % 3) * 0.08;
+      isoPyramid(R, x + 0.08, y + 0.08, x + 0.92, y + 0.92, z, z + ht, shade(pk, 0.12), pk, shade(pk, -0.25));
+      if (stage >= 1) isoPyramid(R, x + 0.5 - 0.42 * 0.32, y + 0.5 - 0.42 * 0.32, x + 0.5 + 0.42 * 0.32, y + 0.5 + 0.42 * 0.32, z + ht * 0.68, z + ht, "#FFFFFF", "#EEF3F8", "#CBD6E2");
+      break;
+    }
+    case "blossom": {
+      const col = wilt ? P.wilt : P.blossom;
+      if (stage === 0) dots(R, gx, gy, z, [shade(col, 0.2), "#FFFFFF"], 4, hv, 0.035);
+      else roundTree(R, gx - 0.05, gy - 0.05, z, stage === 2 ? 0.95 : 0.7, col, "#7A5038");
+      if (stage === 2) { roundTree(R, gx + 0.25, gy + 0.2, z, 0.6, shade(col, 0.1), "#7A5038"); dots(R, gx, gy + 0.2, z, [shade(col, 0.3)], 3, hv, 0.02); }
+      break;
+    }
+    case "canyon": {
+      const c = R.c, p = R.pr;
+      c.strokeStyle = "rgba(60,20,0,.28)"; c.lineWidth = Math.max(1, s * 0.015);
+      for (const f of [0.33, 0.66]) { c.beginPath(); const a = p(x, y + 1, z * f), b = p(x + 1, y + 1, z * f), d = p(x + 1, y, z * f); c.moveTo(a[0], a[1]); c.lineTo(b[0], b[1]); c.lineTo(d[0], d[1]); c.stroke(); }
+      if (stage >= 1) isoBox(R, x + 0.55, y + 0.25, x + 0.75, y + 0.45, z, z + 0.2 + stage * 0.15, shade(P.canyon, 0.1), shade(P.canyon, -0.15), shade(P.canyon, -0.32));
+      if (stage === 2) isoBox(R, x + 0.2, y + 0.55, x + 0.36, y + 0.71, z, z + 0.25, shade(P.canyon, 0.1), shade(P.canyon, -0.15), shade(P.canyon, -0.32));
+      break;
+    }
+    case "crystal": {
+      const col = wilt ? P.wilt : P.crystal;
+      crystalShard(R, gx, gy, z, 0.22 + stage * 0.1, col);
+      if (stage >= 1) crystalShard(R, gx - 0.2, gy + 0.12, z, 0.18 + stage * 0.06, col);
+      if (stage === 2) crystalShard(R, gx + 0.18, gy - 0.15, z, 0.28, shade(col, 0.15));
+      break;
+    }
   }
 }
 
-/* map widget */
+function drawMap(ctx, w, h, st) {
+  const P = pal(), s = st.view.s, hu = s * 0.3, now = performance.now();
+  const uc = st.view.cx - st.view.cy, vc = st.view.cx + st.view.cy;
+  const pr = (wx, wy, z) => [w / 2 + ((wx - wy) - uc) * s / 2, h / 2 + ((wx + wy) - vc) * s / 4 - z * hu];
+  const R = { c: ctx, P, s, hu, pr, now };
+  ctx.clearRect(0, 0, w, h);
+  const g = ctx.createLinearGradient(0, 0, 0, h); g.addColorStop(0, P.sea); g.addColorStop(1, P.sea2);
+  ctx.fillStyle = g; ctx.fillRect(0, 0, w, h);
+  const [o0x, o0y] = pr(0, 0, 0), sp = 34, offx = ((o0x % sp) + sp) % sp, offy = ((o0y % (sp / 2)) + sp / 2) % (sp / 2);
+  ctx.strokeStyle = P.seaInk; ctx.lineWidth = 1.2; ctx.lineCap = "round";
+  for (let y = offy - sp, row = 0; y < h + sp; y += sp / 2, row++) for (let x = offx - sp + (row % 2 ? sp / 2 : 0); x < w + sp; x += sp) {
+    ctx.beginPath(); ctx.moveTo(x - 5, y); ctx.quadraticCurveTo(x - 2.5, y - 2.5, x, y); ctx.quadraticCurveTo(x + 2.5, y + 2.5, x + 5, y); ctx.stroke();
+  }
+  const model = st.model;
+  if (!model) return;
+  let tiles = model.tiles, cutD = null;
+  if (st.replay) {
+    const p = Math.min(1, (now - st.replay.start) / st.replay.dur);
+    tiles = tiles.slice(0, Math.floor(p * tiles.length));
+    cutD = tiles.length ? tiles[tiles.length - 1].d : "0000";
+    if (p >= 1) { st.replay = null; cutD = null; tiles = model.tiles; }
+  }
+  const has = id => model.found[id] && (!cutD || model.found[id].d <= cutD);
+  const visOcc = cutD ? new Map([["0,0", model.occ.get("0,0")], ...tiles.map(t => [keyOf(t.x, t.y), t])]) : model.occ;
+  const homeTier = realmOf(tiles.length).i;
+  const dropOf = tile => {
+    if (!st.anim || keyOf(tile.x, tile.y) !== st.anim.key) return 0;
+    const p = Math.min(1, (now - st.anim.start) / 520);
+    if (p >= 1) st.anim = null;
+    return (1 - p) * (1 - p) * 5;
+  };
+  // sea level: surf ring, then beach
+  const ring = (x, y, e, col) => poly(ctx, [pr(x - e, y - e, 0), pr(x + 1 + e, y - e, 0), pr(x + 1 + e, y + 1 + e, 0), pr(x - e, y + 1 + e, 0)], col);
+  for (const t of visOcc.values()) ring(t.x, t.y, 0.22, P.shore);
+  for (const t of visOcc.values()) ring(t.x, t.y, 0.1, P.sand);
+  // painter's order
+  const items = [];
+  for (const t of visOcc.values()) items.push({ k: t.home ? "home" : "tile", t, x: t.x, y: t.y });
+  if (!cutD) for (const [x, y] of model.lagoons) items.push({ k: "lagoon", x, y });
+  if (st.brush && !st.replay) for (const k of frontierOf(model.occ)) { const [x, y] = k.split(",").map(Number); items.push({ k: "front", x, y }); }
+  if (has("boat")) {
+    let [bx, by] = [model.found.boat.x, model.found.boat.y];
+    const blocked = (x, y) => visOcc.has(keyOf(x, y)) || model.lagoons.some(l => l[0] === x && l[1] === y);
+    if (blocked(bx, by)) {
+      outer: for (let r = 1; r < 8; r++) for (let dx = -r; dx <= r; dx++) for (const dy of [-r, r]) { if (!blocked(bx + dx, by + dy) && !blocked(bx + dy, by + dx)) { bx += dx; by += dy; break outer; } }
+    }
+    items.push({ k: "boat", x: bx, y: by });
+  }
+  items.sort((a, b) => (a.x + a.y) - (b.x + b.y) || a.x - b.x);
+  const falls = has("falls") ? model.found.falls : null;
+  const fallsAfter = falls ? ((falls.x + falls.y) - (falls.px + falls.py) || falls.x - falls.px) > 0 ? keyOf(falls.x, falls.y) : keyOf(falls.px, falls.py) : null;
+  const pulse = 0.55 + 0.35 * Math.sin(now / 260);
+  for (const it of items) {
+    if (it.k === "lagoon") {
+      poly(ctx, [pr(it.x, it.y, 0.02), pr(it.x + 1, it.y, 0.02), pr(it.x + 1, it.y + 1, 0.02), pr(it.x, it.y + 1, 0.02)], P.lagoon);
+      dots(R, it.x + 0.5, it.y + 0.5, 0.02, ["rgba(255,255,255,.8)"], 2, hash2(it.x, it.y), 0.018);
+      continue;
+    }
+    if (it.k === "front") {
+      const col = P[st.brush.terrain] || P.accent, e = 0.08, pts = [pr(it.x + e, it.y + e, 0.05), pr(it.x + 1 - e, it.y + e, 0.05), pr(it.x + 1 - e, it.y + 1 - e, 0.05), pr(it.x + e, it.y + 1 - e, 0.05)];
+      ctx.save(); ctx.globalAlpha = 0.35 * pulse; poly(ctx, pts, col); ctx.globalAlpha = pulse;
+      ctx.setLineDash([Math.max(3, s * 0.08), Math.max(2, s * 0.06)]); ctx.lineWidth = Math.max(1.5, s * 0.035); ctx.strokeStyle = col;
+      ctx.beginPath(); ctx.moveTo(pts[0][0], pts[0][1]); for (const q of pts.slice(1)) ctx.lineTo(q[0], q[1]); ctx.closePath(); ctx.stroke(); ctx.restore();
+      continue;
+    }
+    if (it.k === "boat") { boatAt(R, it.x, it.y); continue; }
+    const t = it.t, terr = t.home ? "home" : t.terrain;
+    const drop = t.home ? 0 : dropOf(t), z = (t.home ? 1 : t.z) + drop;
+    if (drop) ctx.globalAlpha = Math.max(0.2, 1 - drop / 5);
+    const top = t.wilt ? P.wiltTops[terr] : P.tops[terr];
+    isoBox(R, t.x, t.y, t.x + 1, t.y + 1, drop, z, top, P.lefts[terr], P.rights[terr]);
+    if (!t.home && terr !== "lake" && terr !== "dunes" && terr !== "peaks" && terr !== "canyon" && terr !== "crystal") {
+      // a strip of turf along the top of the dirt sides
+      const lip = Math.min(0.22, z * 0.25);
+      poly(ctx, [pr(t.x, t.y + 1, z), pr(t.x + 1, t.y + 1, z), pr(t.x + 1, t.y + 1, z - lip), pr(t.x, t.y + 1, z - lip)], shade(top, -0.12));
+      poly(ctx, [pr(t.x + 1, t.y, z), pr(t.x + 1, t.y + 1, z), pr(t.x + 1, t.y + 1, z - lip), pr(t.x + 1, t.y, z - lip)], shade(top, -0.26));
+    }
+    if (s >= 14) { ctx.strokeStyle = "rgba(255,255,255,.14)"; ctx.lineWidth = 1; const a = pr(t.x, t.y + 1, z), b = pr(t.x, t.y, z), c2 = pr(t.x + 1, t.y, z); ctx.beginPath(); ctx.moveTo(a[0], a[1]); ctx.lineTo(b[0], b[1]); ctx.lineTo(c2[0], c2[1]); ctx.stroke(); }
+    if (s >= 9) {
+      const disc = !t.home && model.onTile.get(keyOf(t.x, t.y));
+      if (t.home) homeObject(R, z, homeTier);
+      else if (disc && has(disc)) discoveryObject(R, disc, t.x, t.y, z);
+      else if (t.landmark) house(R, t.x, t.y, z, model.perfectDays >= 15 ? 2 : model.perfectDays >= 5 ? 1 : 0);
+      else if (s >= 12) terrainDecor(R, t);
+    }
+    if (falls && fallsAfter === keyOf(t.x, t.y)) {
+      const lake = model.occ.get(keyOf(falls.x, falls.y)), peak = model.occ.get(keyOf(falls.px, falls.py));
+      if (lake && peak) {
+        const ex = (falls.x + falls.px + 1) / 2, ey = (falls.y + falls.py + 1) / 2, ztop = peak.z + 0.35;
+        const [X1, Y1] = pr(ex, ey, ztop), [X2, Y2] = pr(ex, ey, lake.z), wd = s * 0.09;
+        const fg = ctx.createLinearGradient(0, Y1, 0, Y2); fg.addColorStop(0, "#DFF4FF"); fg.addColorStop(1, "#8FD0F5");
+        ctx.fillStyle = fg; ctx.fillRect(X1 - wd / 2, Y1, wd, Y2 - Y1);
+        ctx.fillStyle = "rgba(255,255,255,.85)"; ctx.beginPath(); ctx.ellipse(X2, Y2, wd * 1.4, wd * 0.5, 0, 0, Math.PI * 2); ctx.fill();
+      }
+    }
+    ctx.globalAlpha = 1;
+  }
+  if (has("balloon") && s >= 6) { const bp = model.balloonPos || [1.9, -0.9]; balloonAt(R, bp[0], bp[1], model.mini ? 2.6 : 4.5); }
+  // region names
+  if (!st.noLabels && !cutD && s >= 18) {
+    const placed = [];
+    let shown = 0;
+    ctx.textAlign = "center"; ctx.textBaseline = "middle";
+    for (const r of model.regions) {
+      if (shown >= 5 || r.size < 6) continue;
+      const size = Math.round(Math.max(10, Math.min(14, s * 0.12 + Math.sqrt(r.size) * 0.8)));
+      ctx.font = "700 " + size + "px 'Bricolage Grotesque', system-ui, sans-serif";
+      if ("letterSpacing" in ctx) ctx.letterSpacing = "0.06em";
+      const [X, Y] = pr(r.cx, r.cy, r.z + 1.1), text = r.name.toUpperCase(), tw = ctx.measureText(text).width;
+      const box = [X - tw / 2 - 4, Y - size / 2 - 3, X + tw / 2 + 4, Y + size / 2 + 3];
+      if (box[0] < 4 || box[2] > w - 4 || box[1] < 4 || box[3] > h - 4) continue;
+      if (placed.some(b => !(box[2] < b[0] || box[0] > b[2] || box[3] < b[1] || box[1] > b[3]))) continue;
+      placed.push(box); shown++;
+      ctx.lineWidth = Math.max(3, size * 0.32); ctx.lineJoin = "round"; ctx.strokeStyle = P.halo; ctx.strokeText(text, X, Y);
+      ctx.globalAlpha = 0.82; ctx.fillStyle = P.ink; ctx.fillText(text, X, Y); ctx.globalAlpha = 1;
+    }
+    if ("letterSpacing" in ctx) ctx.letterSpacing = "0px";
+  }
+}
+
+/* ---------- map widget ---------- */
 function fitMap(st) {
   if (!st.w || !st.h) return;
-  let minx = 0, maxx = 0, miny = 0, maxy = 0;
-  const keys = st.model ? [...st.model.occ.keys()] : ["0,0"];
-  if (st.brush && st.model) keys.push(...frontierOf(st.model.occ));
-  for (const k of keys) { const [x, y] = k.split(",").map(Number); if (x < minx) minx = x; if (x > maxx) maxx = x; if (y < miny) miny = y; if (y > maxy) maxy = y; }
-  const pad = st.pad != null ? st.pad : 2.5;
-  const bw = maxx - minx + 1 + pad * 2, bh = maxy - miny + 1 + pad * 2;
-  st.view.s = Math.max(4, Math.min(st.maxS || 46, st.w / bw, st.h / bh));
-  st.view.cx = (minx + maxx + 1) / 2; st.view.cy = (miny + maxy + 1) / 2;
+  let umin = 0, umax = 0, vmin = 0, vmax = 0;
+  const cells = st.model ? [...st.model.occ.keys()] : ["0,0"];
+  if (st.brush && st.model) cells.push(...frontierOf(st.model.occ));
+  for (const k of cells) { const [x, y] = k.split(",").map(Number), u = x - y, v = x + y; if (u < umin) umin = u; if (u > umax) umax = u; if (v < vmin) vmin = v; if (v > vmax) vmax = v; }
+  const pad = st.pad != null ? st.pad : 1.6;
+  const du = umax - umin + 2 + pad * 2, dv = vmax - vmin + 2 + pad * 2;
+  st.view.s = Math.max(6, Math.min(st.maxS || 90, st.w / (du / 2), st.h / (dv / 4 + 0.9)));
+  const ucen = (umin + umax) / 2, vcen = (vmin + vmax) / 2 + 1 - 1.1;
+  st.view.cx = (ucen + vcen) / 2; st.view.cy = (vcen - ucen) / 2;
 }
 function paintMap(st) { if (st.w && st.h) drawMap(st.ctx, st.w, st.h, st); }
 function kickMap(st) {
@@ -1528,10 +1975,26 @@ function kickMap(st) {
   const loop = () => { st.raf = 0; paintMap(st); if (st.brush || st.anim || st.replay) st.raf = requestAnimationFrame(loop); };
   st.raf = requestAnimationFrame(loop);
 }
+function pickCell(st, sx, sy) {
+  const s = st.view.s, hu = s * 0.3, uc = st.view.cx - st.view.cy, vc = st.view.cx + st.view.cy;
+  const pr = (wx, wy, z) => [st.w / 2 + ((wx - wy) - uc) * s / 2, st.h / 2 + ((wx + wy) - vc) * s / 4 - z * hu];
+  const cands = [];
+  for (const t of st.model.occ.values()) cands.push({ x: t.x, y: t.y, z: t.home ? 1 : t.z });
+  if (st.brush) for (const k of frontierOf(st.model.occ)) { const [x, y] = k.split(",").map(Number); cands.push({ x, y, z: 0.05 }); }
+  cands.sort((a, b) => (b.x + b.y) - (a.x + a.y) || b.x - a.x);
+  for (const c of cands) {
+    const [X, Yt] = pr(c.x + 0.5, c.y + 0.5, c.z), Yb = Yt + c.z * hu, dx = Math.abs(sx - X) / (s / 2);
+    if (dx > 1) continue;
+    const half = (1 - dx) * s / 4;
+    if (sy >= Yt - half && sy <= Yb + half) return [c.x, c.y];
+  }
+  const u = (sx - st.w / 2) / (s / 2) + uc, v = (sy - st.h / 2) / (s / 4) + vc;
+  return [Math.floor((u + v) / 2), Math.floor((v - u) / 2)];
+}
 function createMap(host, opts) {
-  const cv = h("canvas", { class: "map-canvas", role: "img", "aria-label": opts.label || "Your habit map" });
+  const cv = h("canvas", { class: "map-canvas", role: "img", "aria-label": opts.label || "Your habit island" });
   host.prepend(cv);
-  const st = { cv, ctx: cv.getContext("2d"), w: 0, h: 0, view: { cx: 0.5, cy: 0.5, s: 30 }, auto: true, model: null, brush: null, anim: null, replay: null, raf: 0, maxS: opts.maxS, pad: opts.pad };
+  const st = { cv, ctx: cv.getContext("2d"), w: 0, h: 0, view: { cx: 0.5, cy: 0.5, s: 60 }, auto: true, model: null, brush: null, anim: null, replay: null, raf: 0, maxS: opts.maxS, pad: opts.pad, noLabels: opts.noLabels };
   const ro = new ResizeObserver(() => {
     const r = cv.getBoundingClientRect(), dpr = window.devicePixelRatio || 1;
     st.w = r.width; st.h = r.height;
@@ -1543,44 +2006,56 @@ function createMap(host, opts) {
   ro.observe(cv);
   if (opts.interactive) {
     let down = null;
-    cv.addEventListener("pointerdown", e => {
-      if (e.pointerType !== "mouse" && !st.brush && e.isPrimary === false) return;
-      down = { x: e.clientX, y: e.clientY, cx: st.view.cx, cy: st.view.cy, moved: false, id: e.pointerId };
-    });
+    cv.addEventListener("pointerdown", e => { down = { x: e.clientX, y: e.clientY, cx: st.view.cx, cy: st.view.cy, moved: false, id: e.pointerId }; });
     cv.addEventListener("pointermove", e => {
       if (!down || down.id !== e.pointerId) return;
       const dx = e.clientX - down.x, dy = e.clientY - down.y;
       if (!down.moved && Math.hypot(dx, dy) < 6) return;
       if (!down.moved) { down.moved = true; try { cv.setPointerCapture(e.pointerId); } catch (_) {} cv.classList.add("dragging"); }
       st.auto = false;
-      st.view.cx = down.cx - dx / st.view.s; st.view.cy = down.cy - dy / st.view.s;
+      const du = dx / (st.view.s / 2), dv = dy / (st.view.s / 4);
+      st.view.cx = down.cx - (du + dv) / 2; st.view.cy = down.cy - (dv - du) / 2;
       paintMap(st);
     });
     const end = e => {
       if (!down || down.id !== e.pointerId) return;
       const wasTap = !down.moved && e.type === "pointerup";
       down = null; cv.classList.remove("dragging");
-      if (wasTap) {
+      if (wasTap && st.model) {
         const r = cv.getBoundingClientRect();
-        const x = Math.floor((e.clientX - r.left - st.w / 2) / st.view.s + st.view.cx);
-        const y = Math.floor((e.clientY - r.top - st.h / 2) / st.view.s + st.view.cy);
+        const [x, y] = pickCell(st, e.clientX - r.left, e.clientY - r.top);
         opts.onTap && opts.onTap(x, y);
       }
     };
     cv.addEventListener("pointerup", end);
     cv.addEventListener("pointercancel", end);
-    cv.addEventListener("wheel", e => {
-      if (!e.ctrlKey) return;
-      e.preventDefault();
-      zoomMap(st, e.deltaY < 0 ? 1.15 : 1 / 1.15);
-    }, { passive: false });
+    cv.addEventListener("wheel", e => { if (!e.ctrlKey) return; e.preventDefault(); zoomMap(st, e.deltaY < 0 ? 1.12 : 1 / 1.12); }, { passive: false });
   }
   st.destroy = () => { ro.disconnect(); cancelAnimationFrame(st.raf); st.raf = 0; };
   return st;
 }
-function zoomMap(st, k) { st.auto = false; st.view.s = Math.max(4, Math.min(80, st.view.s * k)); paintMap(st); }
+function zoomMap(st, k) { st.auto = false; st.view.s = Math.max(6, Math.min(160, st.view.s * k)); paintMap(st); }
+function miniScene(id) {
+  const tl = (x, y, terrain, extra) => ({ x, y, terrain, z: terrain === "lake" ? 0.42 : terrain === "peaks" ? 1.2 : 0.95, stage: 2, hv: hash2(x, y), d: "0", hid: "", ...extra });
+  const tiles = id === "falls" ? [tl(-1, 0, "peaks"), tl(0, 0, "lake")] : id === "boat" ? [tl(-1, -1, "dunes")] : id === "lagoon" ? [tl(-1, -1, "meadow"), tl(0, -1, "meadow"), tl(1, -1, "forest"), tl(-1, 0, "meadow"), tl(1, 0, "forest"), tl(-1, 1, "forest"), tl(0, 1, "meadow"), tl(1, 1, "meadow")] : [tl(0, 0, "meadow")];
+  const occ = new Map(tiles.map(t => [keyOf(t.x, t.y), t]));
+  const onTile = new Map(["lighthouse", "ruins", "stones", "tree"].includes(id) ? [["0,0", id]] : []);
+  const found = { [id]: id === "falls" ? { x: 0, y: 0, px: -1, py: 0, d: "0" } : id === "boat" ? { x: 0, y: 0, d: "0" } : { x: 0, y: 0, d: "0" } };
+  return { tiles, occ, found, onTile, regions: [], lagoons: id === "lagoon" ? [[0, 0]] : [], perfectDays: 0, mini: true, balloonPos: [0.5, 0.5] };
+}
+function drawDiscoveryIcon(cv, id) {
+  const dpr = window.devicePixelRatio || 1, W = 64, H = 64;
+  cv.width = W * dpr; cv.height = H * dpr;
+  const ctx = cv.getContext("2d"); ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+  const model = miniScene(id);
+  const st = { view: { cx: 0, cy: 0, s: 30 }, model, w: W, h: H, noLabels: true, pad: 0.4, maxS: id === "balloon" ? 26 : 40 };
+  fitMap(st);
+  if (id === "balloon") { st.view.cx -= 0.9; st.view.cy -= 0.9; }
+  if (id === "boat") { st.view.cx += 0.45; st.view.cy += 0.45; }
+  drawMap(ctx, W, H, st);
+}
 
-/* data */
+/* ---------- data ---------- */
 const trackerSaver = (() => {
   let pending = null, busy = false;
   async function flush() {
@@ -1593,14 +2068,11 @@ const trackerSaver = (() => {
   }
   return { save(path, body) { pending = { path, body: clone(body) }; flush(); }, get busy() { return busy || !!pending; } };
 })();
-function commitTracker() { trackerSaver.save(trackerPath(), S.tracker); refresh(); }
+function commitTracker() { TR.ver++; trackerSaver.save(trackerPath(), S.tracker); refresh(); }
 function ensureTracker() {
   if (!S.tracker) S.tracker = { v: 1, created: todayStr(), habits: [], log: {} };
   S.tracker.habits = S.tracker.habits || []; S.tracker.log = S.tracker.log || {};
   return S.tracker;
-}
-function trackerDays(t) {
-  return { today: t, yesterday: addDays(t, -1) };
 }
 function startBrush(hb, date) {
   if (readOnly()) { toast("You need edit access to this page to paint"); return; }
@@ -1608,7 +2080,7 @@ function startBrush(hb, date) {
   if (TR.map) { TR.map.brush = TR.brush; if (TR.map.auto) fitMap(TR.map); kickMap(TR.map); }
   refresh();
   const stage = $("#map-stage");
-  if (stage && stage.getBoundingClientRect().top < 0 || (stage && stage.getBoundingClientRect().bottom > innerHeight)) stage.scrollIntoView({ behavior: matchMedia("(prefers-reduced-motion: reduce)").matches ? "auto" : "smooth", block: "center" });
+  if (stage) { const r = stage.getBoundingClientRect(); if (r.top < 0 || r.bottom > innerHeight) stage.scrollIntoView({ behavior: matchMedia("(prefers-reduced-motion: reduce)").matches ? "auto" : "smooth", block: "center" }); }
 }
 function stopBrush() {
   TR.brush = null;
@@ -1620,23 +2092,33 @@ function placeTile(x, y) {
   if (!br) return;
   const before = trackerModel(doc, t);
   doc.log[br.date] = { ...(doc.log[br.date] || {}), [br.hid]: [x, y, Date.now()] };
+  TR.ver++;
   const after = trackerModel(doc, t);
   TR.brush = null;
-  if (TR.map) { TR.map.brush = null; TR.map.model = after; TR.map.anim = { key: x + "," + y, start: performance.now() }; if (TR.map.auto) fitMap(TR.map); kickMap(TR.map); }
+  if (TR.map) { TR.map.brush = null; TR.map.model = after; TR.map.anim = { key: keyOf(x, y), start: performance.now() }; if (TR.map.auto) fitMap(TR.map); kickMap(TR.map); }
   commitTracker();
   const r0 = realmOf(before.tiles.length), r1 = realmOf(after.tiles.length);
   const pd = after.perDay[br.date], wasPerfect = before.perDay[br.date] && before.perDay[br.date].perfect;
-  toast("+1 square · " + after.tiles.length + " total");
-  if (pd && pd.perfect && !wasPerfect) setTimeout(() => toast("Perfect day. A house went up on your land.", true), 450);
-  if (r1.i > r0.i) setTimeout(() => toast("Your land is now a " + r1.name + "!", true), 900);
+  const hs0 = before.hstat[br.hid], revived = hs0 && hs0.wilting;
+  toast(revived ? "Revived! Your " + TERRAIN_NAME[br.terrain].toLowerCase() + " is green again." : "+1 square · " + after.tiles.length + " total");
+  let delay = 450;
+  if (pd && pd.perfect && !wasPerfect) { setTimeout(() => toast("Perfect day. A house went up on your island.", true), delay); delay += 500; }
+  if (r1.i > r0.i) { setTimeout(() => toast("Your island is now a " + r1.name + ". Home became " + HOME_NAMES[r1.i] + ".", true), delay); delay += 500; }
+  for (const d of DISCOVERIES) if (after.found[d.id] && !before.found[d.id]) { setTimeout(() => toast("Discovery: " + d.name + "!", true), delay); delay += 500; }
+  const newRegion = after.regions.find(r => !before.regions.some(b => b.name === r.name));
+  if (newRegion) setTimeout(() => toast("New region: " + newRegion.name, true), delay);
 }
 function tapCell(x, y) {
   const st = TR.map;
   if (!st || !st.model) return;
-  const k = x + "," + y, tile = st.model.occ.get(k);
+  const k = keyOf(x, y), tile = st.model.occ.get(k);
   if (!TR.brush) {
-    if (tile && tile.home) toast("Home. Your land grows from here.");
-    else if (tile) { const hb = st.model.habits.find(z => z.id === tile.hid); toast((hb ? hb.name : "Square") + " · " + fmtDate(tile.d) + (tile.landmark ? " · perfect day" : "")); }
+    if (tile && tile.home) toast("Home: " + HOME_NAMES[realmOf(st.model.tiles.length).i] + ". It grows with your island.");
+    else if (tile) {
+      const hb = st.model.habits.find(z => z.id === tile.hid), disc = st.model.onTile.get(k);
+      const region = st.model.regions.find(r => Math.abs(r.cx - (tile.x + 0.5)) < 4 && Math.abs(r.cy - (tile.y + 0.5)) < 4 && r.terrain === tile.terrain);
+      toast((hb ? hb.name : "Square") + " · " + fmtDate(tile.d) + (disc ? " · " + DISCOVERIES.find(d => d.id === disc).name : tile.landmark ? " · perfect day" : region ? " · " + region.name : "") + (tile.wilt ? " · wilting" : ""));
+    }
     return;
   }
   if (tile) { toast("That square is already painted"); return; }
@@ -1657,31 +2139,37 @@ function undoTile(hb, date) {
   toast("Square removed");
 }
 
-/* views */
+/* ---------- views ---------- */
 function terrainSwatch(terrain, cls) { return h("span", { class: "tswatch " + (cls || ""), style: "background:var(--t-" + terrain + ")", "aria-hidden": "true" }); }
+function islandName() { return (S.tracker && S.tracker.name) || ""; }
 function renderMapView(view) {
   const ro = readOnly();
   if (ro) view.append(h("div", { class: "notice warn", style: "margin-bottom:16px" }, "You can't save here. Ask the owner of this page to share it with you as an Editor."));
   view.append(
     h("section", { class: "map-head" },
-      h("div", { style: "min-width:0" }, h("div", { class: "eyebrow" }, "Personal · only you can see it"), h("h1", null, "My map"), h("div", { id: "realm-line", class: "realm-line" })),
+      h("div", { style: "min-width:0" }, h("div", { class: "eyebrow" }, "Personal · only you can see it"),
+        h("div", { class: "island-title" }, h("h1", { id: "island-name" }, "My island"), ro ? null : h("button", { class: "btn sm ghost", id: "rename-btn", onclick: openIslandNameSheet }, "Rename")),
+        h("div", { id: "realm-line", class: "realm-line" })),
       h("div", { class: "head-actions" },
-        h("button", { class: "btn", id: "btn-replay", onclick: () => { const st = TR.map; if (!st || !st.model || !st.model.tiles.length) { toast("Paint a few squares first"); return; } if (st.auto) fitMap(st); st.replay = { start: performance.now(), dur: Math.min(7000, 1200 + st.model.tiles.length * 45) }; kickMap(st); } }, "Replay growth"),
+        h("button", { class: "btn", id: "btn-replay", onclick: () => { const st = TR.map; if (!st || !st.model || !st.model.tiles.length) { toast("Paint a few squares first"); return; } if (st.auto) fitMap(st); st.replay = { start: performance.now(), dur: Math.min(8000, 1400 + st.model.tiles.length * 50) }; kickMap(st); } }, "Replay growth"),
         S.downloads ? h("button", { class: "btn", onclick: saveMapImage }, "Save image") : null,
         h("button", { class: "btn", onclick: openMapHabitsSheet, disabled: ro ? true : null }, icon("gear"), "Habits"))),
     h("div", { class: "map-layout" },
-      h("div", { class: "card map-card" },
-        h("div", { class: "map-stage", id: "map-stage" },
-          h("div", { class: "map-zoom" },
-            h("button", { "aria-label": "Zoom in", onclick: () => TR.map && zoomMap(TR.map, 1.3) }, "+"),
-            h("button", { "aria-label": "Zoom out", onclick: () => TR.map && zoomMap(TR.map, 1 / 1.3) }, "−"),
-            h("button", { "aria-label": "Fit the whole map", onclick: () => { if (TR.map) { TR.map.auto = true; fitMap(TR.map); paintMap(TR.map); } } }, "⤢")),
-          h("div", { id: "map-banner" })),
-        h("div", { class: "milestone", id: "milestone" })),
+      h("div", { class: "col" },
+        h("div", { class: "card map-card" },
+          h("div", { class: "map-stage", id: "map-stage" },
+            h("div", { class: "map-zoom" },
+              h("button", { "aria-label": "Zoom in", onclick: () => TR.map && zoomMap(TR.map, 1.3) }, "+"),
+              h("button", { "aria-label": "Zoom out", onclick: () => TR.map && zoomMap(TR.map, 1 / 1.3) }, "−"),
+              h("button", { "aria-label": "Fit the whole island", onclick: () => { if (TR.map) { TR.map.auto = true; fitMap(TR.map); paintMap(TR.map); } } }, "⤢")),
+            h("div", { id: "map-banner" })),
+          h("div", { class: "milestone", id: "milestone" })),
+        h("section", { class: "card panel", id: "map-discoveries" })),
       h("div", { class: "col" },
         h("section", { class: "card panel", id: "map-today" }),
         h("section", { class: "card panel", id: "map-legend" }))));
   TR.map = createMap($("#map-stage"), { interactive: true, onTap: tapCell });
+  TR.discDrawn = "";
 }
 function updateMapView() {
   const t = todayStr(), doc = S.tracker, model = trackerModel(doc, t);
@@ -1689,14 +2177,17 @@ function updateMapView() {
   if (TR.brush && !habits.some(hb => hb.id === TR.brush.hid)) TR.brush = null;
   if (TR.map) { TR.map.model = model; TR.map.brush = TR.brush; if (TR.map.auto) fitMap(TR.map); TR.brush || TR.map.anim || TR.map.replay ? kickMap(TR.map) : paintMap(TR.map); }
   const realm = realmOf(model.tiles.length);
+  const nm = $("#island-name"); if (nm) nm.textContent = islandName() || "My island";
+  const rb = $("#rename-btn"); if (rb) rb.textContent = islandName() ? "Rename" : "Name it";
   const rl = $("#realm-line");
-  if (rl) put(rl, h("b", null, realm.name), " · " + fmtNum(model.tiles.length) + " square" + (model.tiles.length === 1 ? "" : "s") + (model.first ? " · since " + fmtDate(model.first) : ""));
+  if (rl) put(rl, h("b", null, realm.name), " · " + fmtNum(model.tiles.length) + " square" + (model.tiles.length === 1 ? "" : "s") + (model.regions.length ? " · " + model.regions.length + " region" + (model.regions.length === 1 ? "" : "s") : "") + (model.first ? " · since " + fmtDate(model.first) : ""));
   const ms = $("#milestone");
   if (ms) {
     if (realm.next) {
       const p = (model.tiles.length - realm.at) / (realm.next - realm.at);
       put(ms, h("div", { class: "milestone-line" }, h("span", null, h("b", null, realm.name), " → " + realm.nextName), h("span", { class: "mono muted" }, (realm.next - model.tiles.length) + " squares to go")),
-        h("div", { class: "bar gold" }, h("i", { style: "width:" + Math.max(2, p * 100) + "%" })));
+        h("div", { class: "bar gold" }, h("i", { style: "width:" + Math.max(2, p * 100) + "%" })),
+        h("div", { class: "muted", style: "font-size:13px" }, "At " + realm.nextName + ", home becomes " + HOME_NAMES[realm.i + 1] + "."));
     } else put(ms, h("div", { class: "milestone-line" }, h("span", null, h("b", null, realm.name), ". The largest realm there is."), h("span", { class: "mono muted" }, fmtNum(model.tiles.length) + " squares")));
   }
   const banner = $("#map-banner");
@@ -1706,25 +2197,42 @@ function updateMapView() {
       h("div", { style: "min-width:0;flex:1" }, h("b", null, TR.brush.name), h("div", { class: "muted", style: "font-size:13px" }, "Tap a glowing square next to your land")),
       h("button", { class: "btn sm primary", onclick: autoPlace }, "Place for me"),
       h("button", { class: "btn sm ghost", onclick: stopBrush }, "Cancel"))
-      : !model.tiles.length && S.tracker !== undefined ? h("div", { class: "brush-banner quiet" }, h("div", null, h("b", null, "This is home."), h("div", { class: "muted", style: "font-size:13px" }, "Every habit you complete paints one square here. Pick where it goes and watch your land grow."))) : null);
+      : !model.tiles.length && S.tracker !== undefined ? h("div", { class: "brush-banner quiet" }, h("div", null, h("b", null, "This is home: a tent and a campfire."), h("div", { class: "muted", style: "font-size:13px" }, "Every habit you complete adds one square of land. Pick where it goes. Forests grow, villages appear, and the camp becomes a castle."))) : null);
     $("#map-stage").classList.toggle("brushing", !!TR.brush);
   }
   const today = $("#map-today");
   if (today) put(today, mapTodayPanel(model, habits, t));
   const legend = $("#map-legend");
   if (legend) put(legend, mapLegendPanel(model, habits));
+  const disc = $("#map-discoveries");
+  if (disc) {
+    const sig = DISCOVERIES.map(d => model.found[d.id] ? d.id : "").join("|") + document.documentElement.getAttribute("data-theme") + matchMedia("(prefers-color-scheme: dark)").matches;
+    if (sig !== TR.discDrawn) { TR.discDrawn = sig; put(disc, discoveriesPanel(model)); }
+  }
+}
+function discoveriesPanel(model) {
+  const n = DISCOVERIES.filter(d => model.found[d.id]).length;
+  return [
+    h("div", { class: "panel-head" }, h("h2", { style: "font-size:20px" }, "Discoveries"), h("span", { class: "eyebrow" }, n + " of " + DISCOVERIES.length + " found")),
+    h("div", { class: "discoveries" }, DISCOVERIES.map(d => {
+      const f = model.found[d.id];
+      if (!f) return h("div", { class: "disc locked" }, h("div", { class: "disc-art mystery", "aria-hidden": "true" }, "?"), h("b", null, "Undiscovered"), h("span", null, d.hint));
+      const cv = h("canvas", { class: "disc-art", width: "64", height: "64", "aria-hidden": "true" });
+      requestAnimationFrame(() => drawDiscoveryIcon(cv, d.id));
+      return h("div", { class: "disc" }, cv, h("b", null, d.name), h("span", null, "Found " + fmtDate(f.d)));
+    })),
+  ];
 }
 function mapTodayPanel(model, habits, t) {
   const out = [];
-  const days = trackerDays(t);
-  const date = days[TR.day];
+  const date = TR.day === "today" ? t : addDays(t, -1);
   out.push(h("div", { class: "panel-head" }, h("h2", { style: "font-size:20px" }, TR.day === "today" ? "Today" : "Yesterday"),
     h("div", { class: "seg", role: "group", "aria-label": "Day" },
       h("button", { "aria-pressed": String(TR.day === "today"), onclick: () => { TR.day = "today"; if (TR.brush) stopBrush(); refresh(); } }, "Today"),
       h("button", { "aria-pressed": String(TR.day === "yesterday"), onclick: () => { TR.day = "yesterday"; if (TR.brush) stopBrush(); refresh(); } }, "Yesterday"))));
   if (S.tracker === undefined) { out.push(h("div", { class: "skeleton" }), h("div", { class: "skeleton" })); return out; }
   if (!habits.length) {
-    out.push(h("p", { class: "muted", style: "margin:0" }, "Add the habits you want to keep. Each gets its own terrain, so your map shows what you've been doing."),
+    out.push(h("p", { class: "muted", style: "margin:0" }, "Add the habits you want to keep. Each one grows its own terrain on your island: forests, lakes, peaks, crystal fields."),
       readOnly() ? null : h("div", { class: "chips" }, MAP_SUGGEST.map(([n, terr]) => h("button", { class: "chip suggest", onclick: () => addMapHabit(n, terr) }, terrainSwatch(terr, "sm"), n))),
       readOnly() ? null : h("button", { class: "btn primary", onclick: openMapHabitsSheet }, icon("plus"), "Add your own habit"));
     return out;
@@ -1744,12 +2252,14 @@ function mapTodayPanel(model, habits, t) {
         h("div", { class: "habit-sub" },
           st.streak > 0 ? h("span", { class: "streak" }, icon("flame"), st.streak + "d") : null,
           h("span", null, TERRAIN_NAME[hb.terrain] + " · " + st.count + " sq"),
+          st.wilting && !done ? h("span", { class: "wilt-chip" }, "Wilting · paint to revive") : null,
+          st.streak >= 5 ? h("span", { class: "grow-chip" }, "Growing fast") : null,
           before ? h("span", null, "Added today") : null)),
       h("div", { class: "habit-right" }, brushing ? h("span", { class: "xp-chip" }, "Painting…") : done ? h("span", { class: "muted", style: "font-size:13px" }, "Painted") : null));
   });
   out.push(h("div", { class: "habits" }, rows));
   const pd = model.perDay[date], left = habits.filter(hb => activeOn(hb, date) && !(log[date] && log[date][hb.id])).length;
-  out.push(h("p", { class: "muted", style: "margin:0;font-size:13px" }, pd && pd.perfect ? "Perfect day. A house stands on your land for it." : left ? left + " more for a perfect day. Perfect days build a house." : ""));
+  out.push(h("p", { class: "muted", style: "margin:0;font-size:13px" }, pd && pd.perfect ? "Perfect day. A house stands on your island for it." : left ? left + " more for a perfect day. Perfect days build a house." : ""));
   return out;
 }
 function mapLegendPanel(model, habits) {
@@ -1759,16 +2269,33 @@ function mapLegendPanel(model, habits) {
       h("div", { class: "stat" }, h("b", null, model.perfectDays), h("span", null, "Houses (perfect days)")),
       h("div", { class: "stat" }, h("b", { style: "color:var(--flame)" }, model.dayStreak), h("span", null, "Days in a row")),
       h("div", { class: "stat" }, h("b", null, model.bestDay), h("span", null, "Best run"))),
-    habits.length ? h("div", { class: "legend" }, h("span", { class: "eyebrow" }, "Legend"),
+    habits.length ? h("div", { class: "legend" }, h("span", { class: "eyebrow" }, "Terrain"),
       habits.map(hb => { const s = model.hstat[hb.id] || { count: 0 }; return h("div", { class: "legend-row" }, terrainSwatch(hb.terrain), h("span", { class: "legend-name" }, hb.name), h("span", { class: "mono muted" }, s.count)); })) : null,
+    model.regions.length ? h("div", { class: "legend" }, h("span", { class: "eyebrow" }, "Regions"),
+      model.regions.slice(0, 8).map(r => h("div", { class: "legend-row" }, terrainSwatch(r.terrain), h("span", { class: "legend-name region-name" }, r.name), h("span", { class: "mono muted" }, r.size)))) : null,
+    h("p", { class: "muted", style: "margin:0;font-size:12.5px" }, "Squares grow as they age, faster while a habit's streak is 5+ days. Skip a habit 3 days and its land starts to wilt until you paint it again. 4 touching squares of one terrain become a named region."),
   ];
 }
 function addMapHabit(name, terrain) {
   const doc = ensureTracker();
   const active = doc.habits.filter(x => !x.archived);
-  if (active.length >= MAX_MAP_HABITS) { toast("You can keep up to " + MAX_MAP_HABITS + " habits on your map"); return; }
+  if (active.length >= MAX_MAP_HABITS) { toast("You can keep up to " + MAX_MAP_HABITS + " habits on your island"); return; }
   doc.habits = [...doc.habits, { id: "m" + rid(6), name: name.slice(0, 48), terrain, since: todayStr() }];
   commitTracker();
+}
+function openIslandNameSheet() {
+  if (readOnly()) return;
+  const inp = h("input", { type: "text", id: "island-input", maxlength: "32", value: islandName(), placeholder: "e.g. Isle of Dawn" });
+  const ideas = h("div", { class: "chips" });
+  const roll = () => put(ideas, [...ISLAND_IDEAS].sort(() => Math.random() - 0.5).slice(0, 4).map(n => h("button", { type: "button", class: "chip suggest", onclick: () => { inp.value = n; inp.focus(); } }, n)));
+  roll();
+  openSheet("Name your island", h("form", { id: "island-form", class: "form-section", onsubmit: e => {
+    e.preventDefault();
+    const v = inp.value.trim().slice(0, 32);
+    ensureTracker().name = v;
+    commitTracker(); closeSheet(); toast(v ? "Welcome to " + v : "Name cleared");
+  } }, h("label", { class: "field" }, h("span", null, "Island name"), inp), ideas, h("button", { type: "button", class: "linkish", style: "justify-self:start;font-size:13px", onclick: roll }, "More ideas")),
+  h("button", { class: "btn primary", type: "submit", form: "island-form" }, "Save"));
 }
 function openMapHabitsSheet() {
   if (readOnly()) return;
@@ -1781,7 +2308,7 @@ function openMapHabitsSheet() {
     put(body,
       active.map(hb => h("div", { class: "map-habit-edit" },
         h("input", { type: "text", id: "mh-" + hb.id, value: hb.name, maxlength: "48", "aria-label": "Habit name", oninput: e => { hb.name = e.target.value; } }),
-        h("div", { class: "terrain-pick", role: "radiogroup", "aria-label": "Terrain for " + hb.name },
+        h("div", { class: "terrain-pick", role: "radiogroup", "aria-label": "Terrain for " + (hb.name || "habit") },
           TERRAINS.map(tr => h("button", { type: "button", role: "radio", "aria-checked": String(hb.terrain === tr.k), title: tr.name, "aria-label": tr.name, style: "background:var(--t-" + tr.k + ")", onclick: () => { hb.terrain = tr.k; draw(); } }))),
         h("button", { type: "button", class: "btn sm ghost", onclick: () => { hb.archived = t; draw(); } }, "Archive"))),
       active.length < MAX_MAP_HABITS ? h("button", { type: "button", class: "btn", onclick: () => {
@@ -1789,12 +2316,12 @@ function openMapHabitsSheet() {
         const hb = { id: "m" + rid(6), name: "", terrain: free.k, since: t };
         doc.habits.push(hb); draw(); setTimeout(() => { const el = document.getElementById("mh-" + hb.id); el && el.focus(); });
       } }, icon("plus"), "Add habit") : h("p", { class: "muted", style: "margin:0;font-size:13px" }, "That's the maximum of " + MAX_MAP_HABITS + " active habits."),
-      archived.length ? h("div", { style: "display:grid;gap:6px;border-top:1px solid var(--line);padding-top:12px" }, h("span", { class: "eyebrow" }, "Archived · their land stays on your map"),
+      archived.length ? h("div", { style: "display:grid;gap:6px;border-top:1px solid var(--line);padding-top:12px" }, h("span", { class: "eyebrow" }, "Archived · their land stays on your island"),
         archived.map(hb => h("div", { class: "legend-row" }, terrainSwatch(hb.terrain), h("span", { class: "legend-name" }, hb.name), active.length < MAX_MAP_HABITS ? h("button", { type: "button", class: "btn sm", onclick: () => { delete hb.archived; draw(); } }, "Restore") : null))) : null,
-      h("p", { class: "muted", style: "margin:0;font-size:13px" }, "Archiving a habit takes it off your daily list. Squares it already painted stay."));
+      h("p", { class: "muted", style: "margin:0;font-size:13px" }, "Changing a terrain repaints that habit's land. Archiving takes a habit off your daily list; its squares stay."));
   }
   draw();
-  openSheet("Map habits", body, [h("button", { class: "btn", onclick: closeSheet }, "Cancel"), h("button", { class: "btn primary", onclick: () => {
+  openSheet("Island habits", body, [h("button", { class: "btn", onclick: closeSheet }, "Cancel"), h("button", { class: "btn primary", onclick: () => {
     doc.habits = doc.habits.map(x => ({ ...x, name: (x.name || "").trim().slice(0, 48) })).filter(x => x.name || Object.values(doc.log || {}).some(d => d[x.id]));
     for (const x of doc.habits) if (!x.name) x.name = "Untitled habit";
     S.tracker = { ...ensureTracker(), habits: doc.habits };
@@ -1805,21 +2332,22 @@ async function saveMapImage() {
   const dl = S.downloads;
   if (!dl) return;
   const model = trackerModel(S.tracker, todayStr());
-  const W = 1600, H = 1200, band = 150;
+  const W = 1600, H = 1200, band = 160;
   const c = document.createElement("canvas"); c.width = W; c.height = H;
   const ctx = c.getContext("2d");
-  const st = { w: W, h: H - band, view: { cx: 0.5, cy: 0.5, s: 30 }, model, maxS: 90, pad: 2 };
+  const st = { w: W, h: H - band, view: { cx: 0.5, cy: 0.5, s: 60 }, model, maxS: 150, pad: 1.2 };
   fitMap(st);
   drawMap(ctx, st.w, st.h, st);
   const P = pal(), realm = realmOf(model.tiles.length);
   ctx.fillStyle = P.surface; ctx.fillRect(0, H - band, W, band);
-  ctx.fillStyle = P.ink; ctx.font = "800 58px 'Bricolage Grotesque', system-ui, sans-serif"; ctx.textBaseline = "alphabetic";
-  ctx.fillText(realm.name, 56, H - band + 76);
+  ctx.fillStyle = P.ink; ctx.font = "800 60px 'Bricolage Grotesque', system-ui, sans-serif"; ctx.textBaseline = "alphabetic"; ctx.textAlign = "left";
+  ctx.fillText(islandName() || realm.name, 56, H - band + 80);
   ctx.fillStyle = P.muted; ctx.font = "500 30px Figtree, system-ui, sans-serif";
-  ctx.fillText(fmtNum(model.tiles.length) + " squares · " + model.perfectDays + " perfect days · best run " + model.bestDay + " days" + (model.first ? " · since " + fmtDate(model.first) : ""), 56, H - band + 122);
+  const found = DISCOVERIES.filter(d => model.found[d.id]).length;
+  ctx.fillText(realm.name + " · " + fmtNum(model.tiles.length) + " squares · " + model.perfectDays + " perfect days · " + found + " discoveries" + (model.first ? " · since " + fmtDate(model.first) : ""), 56, H - band + 126);
   try {
     const blob = await new Promise(res => c.toBlob(res, "image/png"));
-    await dl.save({ filename: "my-habit-map.png", data: blob });
+    await dl.save({ filename: (islandName() || "my-island").replace(/[^\w\- ]+/g, "").trim().replace(/\s+/g, "-").toLowerCase() + ".png", data: blob });
   } catch (err) {
     const code = err && err.code;
     if (code === "declined") return;
@@ -1827,7 +2355,7 @@ async function saveMapImage() {
   }
 }
 function mapTeaser() {
-  return h("a", { class: "card map-teaser", href: "#map", "aria-label": "Open my map" },
+  return h("a", { class: "card map-teaser", href: "#map", "aria-label": "Open my island" },
     h("div", { class: "teaser-stage", id: "teaser-stage" }),
     h("div", { class: "teaser-body", id: "teaser-body" }));
 }
@@ -1838,14 +2366,16 @@ function updateMapTeaser() {
   const habits = model.habits.filter(hb => !hb.archived);
   const log = (S.tracker && S.tracker.log) || {};
   const left = habits.filter(hb => activeOn(hb, t) && !(log[t] && log[t][hb.id])).length;
+  const wilting = habits.filter(hb => model.hstat[hb.id] && model.hstat[hb.id].wilting).length;
   if (TR.thumb) { TR.thumb.model = model; fitMap(TR.thumb); paintMap(TR.thumb); }
   put(body,
-    h("div", { class: "eyebrow" }, "My map"),
-    h("h2", null, habits.length ? realm.name : "Grow your own land"),
+    h("div", { class: "eyebrow" }, "My island"),
+    h("h2", null, habits.length ? (islandName() || realm.name) : "Grow your own island"),
     h("p", { class: "muted", style: "margin:0;font-size:14px" }, habits.length
-      ? fmtNum(model.tiles.length) + " squares · " + model.dayStreak + "-day run · " + (left ? left + " to paint today" : "all painted today")
-      : "Your personal tracker. Every habit you complete paints a square, and your island grows into a realm."),
-    h("span", { class: "btn primary sm", style: "justify-self:start" }, habits.length && left ? "Paint today's squares" : "Open my map"));
+      ? realm.name + " · " + fmtNum(model.tiles.length) + " squares · " + model.dayStreak + "-day run · " + (left ? left + " to paint today" : "all painted today")
+      : "Your personal tracker. Every habit you complete adds a square of land. Forests grow, villages appear, and secrets turn up as the island gets bigger."),
+    wilting ? h("p", { class: "wilt-chip", style: "margin:0;justify-self:start" }, wilting + " habit" + (wilting === 1 ? " is" : "s are") + " wilting") : null,
+    h("span", { class: "btn primary sm", style: "justify-self:start" }, habits.length && left ? "Paint today's squares" : "Open my island"));
 }
 
 /* ---------- boot ---------- */
