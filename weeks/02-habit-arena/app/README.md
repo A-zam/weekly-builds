@@ -33,7 +33,7 @@ The path → table mapping is at the top of `src/platform/supabase.js`; the sche
 ## Run locally
 ```bash
 npm install
-npm run dev        # demo mode unless .env.local has Supabase values
+npm run dev        # uses the live project from .env.production; add ?demo for local-only play
 npm test
 npm run build && npm run preview
 ```
@@ -45,7 +45,7 @@ npm run build && npm run preview
    - enable **Manual linking** (lets a guest connect Google later and keep their island)
    - enable **Google**: create an OAuth client in Google Cloud Console (Web application). Add `https://<project-ref>.supabase.co/auth/v1/callback` as an authorized redirect URI. Paste the client ID and secret into Supabase.
 3. **Auth → URL Configuration:** set Site URL to the app URL (e.g. `https://<user>.github.io/habit-arena/`) and add it, plus `http://localhost:5173/`, to Redirect URLs.
-4. **Keys:** copy the Project URL and the **anon** public key from Project Settings → API into `.env.local` (local) and into GitHub → Settings → Secrets and variables → Actions → **Variables** as `SUPABASE_URL` and `SUPABASE_ANON_KEY`. Never use the `service_role` key in the app.
+4. **Keys:** put the Project URL and the **publishable** key (Project Settings → API Keys) in `.env.production`, which is committed because both are public client values. `.env.local` overrides it for local work. Never put the secret or `service_role` key in this repo.
 5. **Hosting:** GitHub → Settings → Pages → Source: **GitHub Actions**. Every push to `main` tests, builds and deploys.
 
 ## Security model

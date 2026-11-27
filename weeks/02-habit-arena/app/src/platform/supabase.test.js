@@ -85,6 +85,22 @@ describe("supabase platform", () => {
     expect(room.data().name).toBe("Gym");
     off();
   });
+  it("reloads a room's member list after joining, since RLS hid the others before", async () => {
+    const sb = fakeSupabase();
+    sb.tables.room_members.push({ room_code: "ABC234", user_id: "u0", joined_at: 1, personal: [], log: {}, cheers: {} });
+    const hidden = sb.from; let member = false;
+    sb.from = t => { const q = hidden(t); if (t !== "room_members" || member) return q; const eq = q.eq; q.eq = (c, v) => { eq(c, v); return eq("user_id", "u1"); }; return q; };
+    const p = makeSupabasePlatform(sb, { id: "u1", user_metadata: {}, is_anonymous: true }, {});
+    const db = await p.use("db");
+    const seen = [];
+    db.collection("rooms/ABC234/members").onSnapshot(s => seen.push(s.docs.map(d => d.id).sort()));
+    await tick();
+    expect(seen.at(-1)).toEqual([]);
+    member = true;
+    await db.doc("rooms/ABC234/members/u1").set({ joinedAt: 2 });
+    await tick(); await tick();
+    expect(seen.at(-1)).toEqual(["u0", "u1"]);
+  });
   it("keeps the private island and the shared copy in separate tables", async () => {
     const sb = fakeSupabase();
     const p = makeSupabasePlatform(sb, { id: "u1", user_metadata: {}, is_anonymous: true }, {});

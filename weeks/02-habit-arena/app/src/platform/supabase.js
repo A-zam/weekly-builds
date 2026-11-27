@@ -128,9 +128,12 @@ export function makeSupabasePlatform(sb, user, { appUrl } = {}) {
       if (removeMatch) {
         for (const [k, r] of c.rows) if (Object.entries(removeMatch).every(([col, v]) => r[col] === v)) { c.rows.delete(k); emit(c); }
       } else if (row[c.col] === c.val) {
-        const prev = c.rows.get(c.pk(row)) || {};
-        c.rows.set(c.pk(row), { ...prev, ...row });
+        const k = c.pk(row), joined = table === "room_members" && row.user_id === uid && !c.rows.has(k);
+        c.rows.set(k, { ...(c.rows.get(k) || {}), ...row });
         emit(c);
+        // Row-level security hides other players until we are a member, so a list loaded before
+        // joining holds only us. Reload it once our membership exists.
+        if (joined && c.col === "room_code") c.load();
       }
     }
   }

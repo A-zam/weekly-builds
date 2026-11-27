@@ -1,7 +1,7 @@
 # Builds, tests and publishes Habit Arena to GitHub Pages on every push to main.
-# Repo settings needed once: Settings → Pages → Source: GitHub Actions,
-# and Settings → Secrets and variables → Actions → Variables: SUPABASE_URL, SUPABASE_ANON_KEY
-# (both are public client values; never put the service_role key here).
+# Repo setting needed once: Settings → Pages → Source: GitHub Actions.
+# The Supabase URL and publishable key come from .env.production (public client values;
+# never put the secret or service_role key in this repo).
 name: Deploy
 on:
   push:
@@ -28,8 +28,6 @@ jobs:
       - run: npm run build
         env:
           VITE_BASE: /${{ github.event.repository.name }}/
-          VITE_SUPABASE_URL: ${{ vars.SUPABASE_URL }}
-          VITE_SUPABASE_ANON_KEY: ${{ vars.SUPABASE_ANON_KEY }}
       - uses: actions/upload-pages-artifact@v3
         with:
           path: dist
