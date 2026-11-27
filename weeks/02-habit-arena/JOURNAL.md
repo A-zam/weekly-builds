@@ -35,7 +35,10 @@ Keep it to 2–4 lines a day: what moved, what's stuck, what got decided.
 - Test caught Pip grammar ("a observatory", "the dunes is") and Pip staying quiet after the first habit was added. Fixed.
 
 ## Sun: Ship
--
+- PO: turn it into a real app. Decisions: installable web app (PWA), Supabase, Google + guest sign-in, its own repo.
+- Kept the game engine untouched: it already spoke a small document API, so I wrote a Supabase adapter (paths → Postgres tables + Realtime) and a localStorage demo adapter behind the same interface.
+- Migration with row-level security for every table; the shared island copy excludes habit names; room check-ins are visible only to members.
+- Verified: 7 adapter unit tests against a fake Supabase client; built-app browser run in demo mode (island → chest → name → reload persists → room → check-in → service worker + manifest); sign-in screen with placeholder Supabase settings. Not verified: a live Supabase project (needs the PO's project; supabase.com is blocked by this environment's network rules).
 
 ---
 

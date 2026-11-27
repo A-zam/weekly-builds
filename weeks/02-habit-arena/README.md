@@ -4,6 +4,8 @@
 
 **Category:** Micro-SaaS / Social · **Mode:** 🤖 Autopilot · **Dates:** Mon Nov 23 – Sun Nov 29, 2026
 
+**🎓 Graduating:** the installable app lives in [`app/`](app) (Vite PWA + Supabase) until it moves to its own repo.
+
 **▶ Demo (MVP):** [Habit Arena on claude.ai](https://claude.ai/artifact/MD1PZZPu6CS3P5RrfcNRL5): private until shared from its Share menu
 
 ## The problem
