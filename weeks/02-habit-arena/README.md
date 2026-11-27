@@ -4,7 +4,7 @@
 
 **Category:** Micro-SaaS / Social · **Mode:** 🤖 Autopilot · **Dates:** Mon Nov 23 – Sun Nov 29, 2026
 
-**🎓 Graduating:** the installable app lives in [`app/`](app) (Vite PWA + Supabase) until it moves to its own repo.
+**🎓 Graduated:** the installable app now lives in its own repo, [a-zam/habit-arena](https://github.com/A-zam/habit-arena) (Vite PWA + Supabase). The [`app/`](app) folder here is the snapshot it started from.
 
 **▶ Demo (MVP):** [Habit Arena on claude.ai](https://claude.ai/artifact/MD1PZZPu6CS3P5RrfcNRL5): private until shared from its Share menu
 
